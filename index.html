@@ -8,10 +8,10 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#0e1117;--surf:#161b27;--card:#1c2333;--bord:#ffffff14;
-  --txt:#e8ecf4;--muted:#7b879e;--hint:#3a4560;
-  --G:#34d399;--Y:#fbbf24;--R:#f87171;--B:#60a5fa;--P:#a78bfa;
-  --gbg:#0d2e22;--ybg:#2d2200;--rbg:#2d1010;--bbg:#0f1f3d;
+  --bg:#fce7f3;--surf:#fbcfe8;--card:#ffffff;--bord:#f9a8d4;
+  --txt:#1a1a2e;--muted:#6b3a5a;--hint:#9d4f7a;
+  --G:#059669;--Y:#d97706;--R:#dc2626;--B:#db2777;--P:#7c3aed;
+  --gbg:#d1fae5;--ybg:#fef3c7;--rbg:#fee2e2;--bbg:#fce7f3;
 }
 body{background:var(--bg);color:var(--txt);font-family:Sarabun,system-ui,sans-serif;font-size:14px;line-height:1.5}
 a{color:var(--B)}
@@ -27,7 +27,7 @@ select:focus,input:focus{outline:none;border-color:var(--B)}
 #inp-search{width:160px}
 #inp-search::placeholder{color:var(--hint)}
 .btn-clear{background:none;border:1px solid var(--bord);color:var(--muted);padding:4px 10px;border-radius:5px;cursor:pointer;font-size:12px;font-family:inherit}
-.btn-clear:hover{color:var(--txt);border-color:var(--muted)}
+.btn-clear:hover{color:var(--txt);border-color:var(--B)}
 .fcount{font-size:11px;color:var(--hint);margin-left:auto}
 /* wrap */
 .wrap{max-width:1260px;margin:0 auto;padding:20px}
@@ -51,38 +51,32 @@ select:focus,input:focus{outline:none;border-color:var(--B)}
 /* season filter chips */
 .season-strip{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px;align-items:center}
 .season-strip span{font-size:11px;color:var(--muted);margin-right:4px}
-.chip{font-size:11px;padding:3px 9px;border-radius:20px;border:1px solid var(--bord);cursor:pointer;background:none;color:var(--muted);font-family:inherit}
+.chip{font-size:11px;padding:3px 9px;border-radius:20px;border:1px solid #f9a8d4;cursor:pointer;background:none;color:var(--muted);font-family:inherit}
 .chip:hover{border-color:var(--B);color:var(--B)}
-.chip.active{background:var(--bbg);color:var(--B);border-color:var(--B)}
+.chip.active{background:#fce7f3;color:var(--B);border-color:var(--B)}
 /* metrics */
 .metrics{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px;margin-bottom:14px}
-.met{background:var(--card);border:1px solid var(--bord);border-radius:10px;padding:12px 14px}
+.met{background:#fff0f6;border:1px solid var(--bord);border-radius:10px;padding:12px 14px}
 .met-lbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px}
 .met-val{font-size:22px;font-weight:600;line-height:1.1}
 .met-sub{font-size:10px;color:var(--hint);margin-top:3px}
 /* card */
-.card{background:var(--card);border:1px solid var(--bord);border-radius:10px;padding:16px}
+.card{background:#ffffff;border:1px solid var(--bord);border-radius:10px;padding:16px}
 .ctitle{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:12px}
 /* grids */
 .g2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
 .g3{display:grid;grid-template-columns:2fr 1fr 1fr;gap:12px;margin-bottom:12px}
 /* stat rows */
-.srow{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--bord)}
+.srow{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid #fcd7e8}
 .srow:last-child{border-bottom:none}
 .srow-name{font-size:12px;color:var(--muted)}
 .srow-val{font-size:13px;font-weight:500}
 /* wdl bars */
 .wdl-r{display:flex;align-items:center;gap:8px;margin:6px 0}
 .wdl-lbl{width:52px;font-size:12px;color:var(--muted)}
-.wdl-track{flex:1;height:7px;background:var(--surf);border-radius:4px;overflow:hidden}
+.wdl-track{flex:1;height:7px;background:#fce7f3;border-radius:4px;overflow:hidden}
 .wdl-fill{height:100%;border-radius:4px}
 .wdl-n{width:28px;text-align:right;font-size:12px;font-weight:500}
-/* compare */
-.crow{display:flex;border-bottom:1px solid var(--bord);font-size:13px}
-.crow:last-child{border:none}
-.ccell{flex:1;padding:7px 8px}
-.ccell.mid{width:90px;flex:none;background:var(--surf);text-align:center;font-size:10px;color:var(--hint)}
-.ccell.win{color:var(--G);font-weight:500}
 /* league/cup split */
 .lcsplit{display:grid;gap:14px;margin-bottom:12px}
 /* canvas */
@@ -115,10 +109,6 @@ canvas{display:block;width:100%!important}
   <select id="sel-player" onchange="onSelectPlayer()">
     <option value="">— เลือกนักเตะ —</option>
   </select>
-  <label>เทียบกับ</label>
-  <select id="sel-cmp" onchange="render()">
-    <option value="">— เปรียบเทียบ —</option>
-  </select>
   <button class="btn-clear" onclick="clearAll()">ล้างทั้งหมด</button>
   <span class="fcount" id="fcount"></span>
 </div>
@@ -143,7 +133,7 @@ function mkChart(id, cfg) {
 }
 
 const G='#34d399',Y='#fbbf24',R='#f87171',B='#60a5fa',P='#a78bfa';
-const gridC='#ffffff08', tickC='#7b879e';
+const gridC='#f9a8d4', tickC='#6b3a5a';
 const baseScales = {
   x:{ticks:{color:tickC,font:{size:11}},grid:{color:gridC}},
   y:{ticks:{color:tickC,font:{size:11}},grid:{color:gridC}}
@@ -157,35 +147,16 @@ function rebuildPlayerList() {
   const pos = document.getElementById('sel-pos').value;
   const q   = document.getElementById('inp-search').value.toLowerCase().trim();
   const s1  = document.getElementById('sel-player');
-  const s2  = document.getElementById('sel-cmp');
-  const prev1 = s1.value, prev2 = s2.value;
-
-  while (s1.options.length > 1) s1.remove(1);
-  while (s2.options.length > 1) s2.remove(1);
-
-  let count = 0;
-  DATA.forEach(p => {
-    const matchPos  = !pos || p.pos === pos;
-    const matchName = !q   || p.nick.toLowerCase().includes(q)
-                            || p.name.toLowerCase().includes(q)
-                            || p.pc.toLowerCase().includes(q);
-    if (!matchPos || !matchName) return;
-    count++;
-    const txt = `${lbl(p)}  (${p.pos}) · ${p.total.apps} นัด`;
-    s1.append(new Option(txt, p.pc));
-    s2.append(new Option(txt, p.pc));
   });
 
   /* restore previous selection if still in list */
   if ([...s1.options].some(o => o.value === prev1)) s1.value = prev1;
-  if ([...s2.options].some(o => o.value === prev2)) s2.value = prev2;
 
   document.getElementById('fcount').textContent = `${count} นักเตะ`;
   render();
 }
 
 function onSelectPlayer() {
-  document.getElementById('sel-cmp').value = '';
   activeSeasons = new Set();
   render();
 }
@@ -194,7 +165,6 @@ function clearAll() {
   document.getElementById('sel-pos').value   = '';
   document.getElementById('inp-search').value = '';
   document.getElementById('sel-player').value = '';
-  document.getElementById('sel-cmp').value    = '';
   activeSeasons = new Set();
   rebuildPlayerList();
 }
@@ -231,20 +201,18 @@ function filtered(p) {
 /* ── RENDER ── */
 function render() {
   const pc1 = document.getElementById('sel-player').value;
-  const pc2 = document.getElementById('sel-cmp').value;
   const wrap = document.getElementById('main');
   if (!pc1) {
     wrap.innerHTML = '<div class="empty"><h2>เลือกนักเตะ</h2><p>ใช้ตัวกรองด้านบนเพื่อค้นหาและเลือกนักเตะ</p></div>';
     return;
   }
-  const p  = filtered(byPC[pc1]);
-  const p2 = pc2 ? byPC[pc2] : null;
-  wrap.innerHTML = buildHTML(p, p2);
-  requestAnimationFrame(() => drawAllCharts(p, p2));
+  const p = filtered(byPC[pc1]);
+  wrap.innerHTML = buildHTML(p);
+  requestAnimationFrame(() => drawAllCharts(p));
 }
 
 /* ── HTML BUILDER ── */
-function buildHTML(p, p2) {
+function buildHTML(p) {
   const t = p.total;
   const gc = t.g + t.a;
   const wr = pct(t.W||0, t.apps);
@@ -367,24 +335,7 @@ function buildHTML(p, p2) {
     </div>`;
   }
 
-  /* compare */
-  if (p2) {
-    const pr2 = byPC[p2.pc]; /* always use raw (unfiltered) data for p2 */
-    const pr1 = byPC[p.pc];  /* raw data for p1 too so comparison is fair */
-    h += `<div class="card" style="margin-bottom:12px">
-      <div class="ctitle">เปรียบเทียบ ${lbl(pr1)} vs ${lbl(pr2)}</div>
-      <div style="position:relative;height:200px;margin-bottom:14px"><canvas id="ch-cmp"></canvas></div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-        ${cmpRow(pr1,pr2,'นัดทั้งหมด','apps')}
-        ${cmpRow(pr1,pr2,'ตัวจริง','starts')}
-        ${cmpRow(pr1,pr2,'สำรอง','subs')}
-        ${cmpRow(pr1,pr2,'ประตู','g')}
-        ${cmpRow(pr1,pr2,'แอสซิสต์','a')}
-        ${cmpRow(pr1,pr2,'G+A',null,'gc')}
-        ${cmpRow(pr1,pr2,'Win %',null,'wr')}
-      </div>
-    </div>`;
-  }
+
 
   return h;
 }
@@ -393,21 +344,10 @@ function sr2(name, val, sub, color) {
   return `<div class="srow"><span class="srow-name">${name}</span><span class="srow-val"${color?` style="color:${color}"`:''}>${val}${sub||''}</span></div>`;
 }
 
-function cmpRow(p1, p2, rowLabel, key, special) {
-  let v1, v2;
-  if (special === 'gc') { v1 = p1.total.g + p1.total.a; v2 = p2.total.g + p2.total.a; }
-  else if (special === 'wr') { v1 = pct(p1.total.W||0, p1.total.apps); v2 = pct(p2.total.W||0, p2.total.apps); }
-  else { v1 = p1.total[key]||0; v2 = p2.total[key]||0; }
-  const suf = special==='wr' ? '%' : '';
-  return `<div class="crow">
-    <div class="ccell${v1>v2?' win':''}">${lbl(p1)}: <b>${v1}${suf}</b></div>
-    <div class="ccell mid">${rowLabel}</div>
-    <div class="ccell${v2>v1?' win':''}" style="text-align:right"><b>${v2}${suf}</b> :${lbl(p2)}</div>
-  </div>`;
-}
+
 
 /* ── CHARTS ── */
-function drawAllCharts(p, p2) {
+function drawAllCharts(p) {
   const seasons = Object.keys(p.by_season).sort();
   const sd = seasons.map(s => p.by_season[s]);
 
@@ -464,37 +404,7 @@ function drawAllCharts(p, p2) {
     }
   });
 
-  /* Comparison radar - always use raw totals for fair comparison */
-  if (p2 && document.getElementById('ch-cmp')) {
-    const r1 = byPC[p.pc];
-    const r2 = byPC[p2.pc];
-    const maxA  = Math.max(r1.total.apps,           r2.total.apps)           || 1;
-    const maxG  = Math.max(r1.total.g,               r2.total.g)               || 1;
-    const maxAs = Math.max(r1.total.a,               r2.total.a)               || 1;
-    const maxGC = Math.max(r1.total.g+r1.total.a,   r2.total.g+r2.total.a)   || 1;
-    const norm = q => [
-      Math.round(q.total.apps / maxA * 100),
-      Math.round(q.total.g    / maxG * 100),
-      Math.round(q.total.a    / maxAs * 100),
-      Math.round((q.total.g + q.total.a) / maxGC * 100),
-      pct(q.total.W || 0, q.total.apps)
-    ];
-    mkChart('ch-cmp', {
-      type: 'radar',
-      data: {
-        labels: ['นัดที่ลง','ประตู','แอสซิสต์','G+A','Win%'],
-        datasets: [
-          {label:lbl(r1), data:norm(r1), borderColor:B, backgroundColor:B+'22', pointBackgroundColor:B},
-          {label:lbl(r2), data:norm(r2), borderColor:P, backgroundColor:P+'22', pointBackgroundColor:P}
-        ]
-      },
-      options: {
-        responsive:true, maintainAspectRatio:false,
-        scales:{r:{ticks:{color:tickC,font:{size:10},backdropColor:'transparent'},grid:{color:'#ffffff12'},pointLabels:{color:tickC,font:{size:11}}}},
-        plugins:{legend:{labels:{color:tickC,font:{size:11}}}}
-      }
-    });
-  }
+
 }
 
 /* ── INIT ── */
