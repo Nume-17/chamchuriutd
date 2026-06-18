@@ -3,395 +3,408 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Chamchuri United — Dashboard</title>
+<title>Chamchuri United — Player Dashboard</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --bg:#0d0f14;--surface:#161a22;--card:#1c2130;--border:#ffffff12;
-  --text:#f0f2f7;--muted:#7a8299;--accent:#4f8ef7;
-  --green:#3db87a;--yellow:#f5c342;--red:#e85757;
-  --green-bg:#1a3328;--yellow-bg:#332d14;--red-bg:#321a1a;
-}
-body{background:var(--bg);color:var(--text);font-family:'Sarabun',sans-serif;font-size:14px;min-height:100vh}
 @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600&display=swap');
+:root{
+  --bg:#0e1117;--surf:#161b27;--card:#1c2333;--bord:#ffffff14;
+  --txt:#e8ecf4;--muted:#7b879e;--hint:#4a5568;
+  --green:#34d399;--gbg:#0d2e22;--gtxt:#34d399;
+  --yellow:#fbbf24;--ybg:#2d2200;--ytxt:#fbbf24;
+  --red:#f87171;--rbg:#2d1010;--rtxt:#f87171;
+  --blue:#60a5fa;--bbg:#0f1f3d;--btxt:#60a5fa;
+  --purple:#a78bfa;
+  --r:10px;
+}
+body{background:var(--bg);color:var(--txt);font-family:'Sarabun',sans-serif;font-size:14px;line-height:1.5}
 
-/* NAV */
-nav{background:var(--surface);border-bottom:1px solid var(--border);padding:0 24px;display:flex;align-items:center;gap:0;height:52px;position:sticky;top:0;z-index:100}
-.nav-logo{font-size:15px;font-weight:600;color:var(--text);margin-right:32px;white-space:nowrap}
-.nav-logo span{color:var(--accent)}
-.nav-tabs{display:flex;gap:4px}
-.nav-tab{padding:6px 16px;border-radius:6px;cursor:pointer;font-size:13px;color:var(--muted);border:none;background:none;transition:all .15s}
-.nav-tab:hover{color:var(--text);background:var(--card)}
-.nav-tab.active{color:var(--text);background:var(--card);font-weight:500}
-.nav-right{margin-left:auto;font-size:12px;color:var(--muted)}
+/* ── TOP BAR ── */
+.topbar{background:var(--surf);border-bottom:1px solid var(--bord);padding:0 20px;height:52px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:50}
+.topbar-logo{font-size:16px;font-weight:600;white-space:nowrap}
+.topbar-logo em{color:var(--blue);font-style:normal}
+.topbar-right{margin-left:auto;font-size:11px;color:var(--muted)}
 
-/* LAYOUT */
-.page{display:none;padding:24px;max-width:1200px;margin:0 auto}
-.page.active{display:block}
+/* ── FILTER STRIP ── */
+.filters{background:var(--surf);border-bottom:1px solid var(--bord);padding:10px 20px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;position:sticky;top:52px;z-index:40}
+.filters label{font-size:11px;color:var(--muted);white-space:nowrap}
+select,input[type=text]{background:var(--card);border:1px solid var(--bord);color:var(--txt);padding:5px 10px;border-radius:6px;font-size:13px;font-family:'Sarabun',sans-serif}
+select:focus,input:focus{outline:none;border-color:var(--blue)}
+input[type=text]{width:160px}
+input::placeholder{color:var(--hint)}
+.clear-btn{font-size:12px;color:var(--muted);cursor:pointer;padding:4px 8px;border:1px solid var(--bord);border-radius:5px;background:none}
+.clear-btn:hover{color:var(--txt)}
+.result-count{font-size:11px;color:var(--muted);margin-left:auto}
 
-/* FILTER BAR */
-.filters{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px;align-items:center}
-.filters label{font-size:12px;color:var(--muted)}
-select{background:var(--card);border:1px solid var(--border);color:var(--text);padding:6px 10px;border-radius:6px;font-size:13px;font-family:'Sarabun',sans-serif;cursor:pointer}
-select:focus{outline:none;border-color:var(--accent)}
+/* ── MAIN LAYOUT ── */
+.wrap{max-width:1280px;margin:0 auto;padding:20px}
 
-/* METRIC CARDS */
-.metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:20px}
-.metric{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px}
-.metric-label{font-size:11px;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:.04em}
-.metric-val{font-size:26px;font-weight:600;line-height:1}
-.metric-sub{font-size:11px;color:var(--muted);margin-top:4px}
-.metric-val.green{color:var(--green)}
-.metric-val.yellow{color:var(--yellow)}
-.metric-val.red{color:var(--red)}
-.metric-val.blue{color:var(--accent)}
+/* ── PLAYER HEADER ── */
+.player-header{display:flex;align-items:center;gap:16px;margin-bottom:20px}
+.avatar{width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:600;flex-shrink:0}
+.avatar.GK{background:#0f1f3d;color:var(--blue)}
+.avatar.DF{background:#0d2e22;color:var(--green)}
+.avatar.MF{background:#2d2200;color:var(--yellow)}
+.avatar.FC{background:#2d1010;color:var(--red)}
+.player-info h1{font-size:20px;font-weight:600;margin:0}
+.player-info p{font-size:13px;color:var(--muted);margin:2px 0 0}
+.pos-badge{display:inline-block;font-size:11px;font-weight:500;padding:2px 8px;border-radius:4px;margin-right:6px}
+.pos-badge.GK{background:var(--bbg);color:var(--btxt)}
+.pos-badge.DF{background:var(--gbg);color:var(--gtxt)}
+.pos-badge.MF{background:var(--ybg);color:var(--ytxt)}
+.pos-badge.FC{background:var(--rbg);color:var(--rtxt)}
+.seasons-list{font-size:11px;color:var(--hint)}
 
-/* GRID */
-.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
-.grid-3{display:grid;grid-template-columns:2fr 1fr 1fr;gap:16px;margin-bottom:16px}
-.card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px}
-.card-title{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:14px}
-canvas{display:block;width:100%!important}
+/* ── METRICS ── */
+.metrics{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px;margin-bottom:16px}
+.metric{background:var(--card);border:1px solid var(--bord);border-radius:var(--r);padding:12px 14px}
+.metric-lbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px}
+.metric-val{font-size:22px;font-weight:600;line-height:1.1}
+.metric-sub{font-size:10px;color:var(--hint);margin-top:3px}
 
-/* TABLE */
-.tbl-wrap{overflow-x:auto}
-table{width:100%;border-collapse:collapse;font-size:13px}
-th{text-align:left;padding:8px 10px;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.04em;border-bottom:1px solid var(--border);font-weight:500}
-td{padding:8px 10px;border-bottom:1px solid var(--border)8;color:var(--text)}
-tr:last-child td{border-bottom:none}
-tr:hover td{background:#ffffff04}
-.badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:500}
-.badge-W{background:var(--green-bg);color:var(--green)}
-.badge-D{background:var(--yellow-bg);color:var(--yellow)}
-.badge-L{background:var(--red-bg);color:var(--red)}
-.badge-H{background:#1a2a44;color:var(--accent)}
-.badge-A{background:#2a1a2a;color:#c084fc}
-.badge-pos{font-size:11px;color:var(--muted)}
-.num{text-align:right;font-family:monospace}
+/* ── GRID ── */
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+.grid-3{display:grid;grid-template-columns:2fr 1fr 1fr;gap:14px;margin-bottom:14px}
+.card{background:var(--card);border:1px solid var(--bord);border-radius:var(--r);padding:16px}
+.card-title{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:12px}
 
-/* SEARCH */
-input[type=text]{background:var(--card);border:1px solid var(--border);color:var(--text);padding:6px 12px;border-radius:6px;font-size:13px;font-family:'Sarabun',sans-serif;width:200px}
-input[type=text]::placeholder{color:var(--muted)}
-input[type=text]:focus{outline:none;border-color:var(--accent)}
+/* ── WIN RATIO MINI ── */
+.wdl-row{display:flex;align-items:center;gap:8px;margin:6px 0}
+.wdl-label{width:54px;font-size:12px;color:var(--muted)}
+.wdl-bar-wrap{flex:1;height:8px;background:var(--surf);border-radius:4px;overflow:hidden}
+.wdl-bar{height:100%;border-radius:4px}
+.wdl-val{width:36px;text-align:right;font-size:12px;font-weight:500}
+.ratio-box{text-align:center;padding:8px 0}
+.ratio-big{font-size:32px;font-weight:600}
+.ratio-lbl{font-size:11px;color:var(--muted);margin-top:2px}
 
-/* SPARKLINE row */
-.season-row{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border)}
-.season-row:last-child{border-bottom:none}
-.season-label{width:44px;font-size:12px;color:var(--muted);flex-shrink:0}
-.season-bars{display:flex;gap:2px;flex:1;align-items:flex-end;height:20px}
-.bar-w{background:var(--green);border-radius:2px 2px 0 0}
-.bar-d{background:var(--yellow);border-radius:2px 2px 0 0}
-.bar-l{background:var(--red);border-radius:2px 2px 0 0}
-.season-pts{width:36px;text-align:right;font-size:12px;color:var(--text);flex-shrink:0}
+/* ── STAT TABLE ── */
+.stat-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--bord)}
+.stat-row:last-child{border-bottom:none}
+.stat-name{font-size:13px;color:var(--muted)}
+.stat-value{font-size:14px;font-weight:500}
 
-/* RESPONSIVE */
-@media(max-width:700px){
-  .metrics{grid-template-columns:repeat(2,1fr)}
-  .grid-2,.grid-3{grid-template-columns:1fr}
-  nav{padding:0 12px}
-  .page{padding:12px}
+/* ── COMP TABS ── */
+.comp-tabs{display:flex;gap:6px;margin-bottom:12px}
+.comp-tab{font-size:12px;padding:4px 10px;border-radius:5px;border:1px solid var(--bord);cursor:pointer;background:none;color:var(--muted)}
+.comp-tab.active{background:var(--bbg);color:var(--blue);border-color:transparent}
+
+/* ── EMPTY / ALL STATE ── */
+.empty{text-align:center;padding:60px 20px;color:var(--muted)}
+.empty h2{font-size:18px;margin-bottom:8px;color:var(--hint)}
+.all-note{background:var(--surf);border:1px solid var(--bord);border-radius:var(--r);padding:14px 16px;font-size:13px;color:var(--muted);margin-bottom:16px}
+
+/* ── COMPARE ── */
+.compare-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+.compare-row{display:flex;border-bottom:1px solid var(--bord);font-size:13px}
+.compare-row:last-child{border:none}
+.compare-cell{flex:1;padding:7px 10px}
+.compare-cell.mid{background:var(--surf);text-align:center;font-size:11px;color:var(--hint);width:80px;flex:none}
+.compare-cell.winner{color:var(--green);font-weight:500}
+
+/* ── RESPONSIVE ── */
+@media(max-width:720px){
+  .metrics{grid-template-columns:repeat(3,1fr)}
+  .grid-2,.grid-3,.compare-grid{grid-template-columns:1fr}
+  .filters{top:52px}
 }
 </style>
 </head>
 <body>
 
-<nav>
-  <div class="nav-logo">⚽ <span>Chamchuri</span> United</div>
-  <div class="nav-tabs">
-    <button class="nav-tab active" onclick="showPage('team')">ทีม</button>
-    <button class="nav-tab" onclick="showPage('player')">นักเตะ</button>
-  </div>
-  <div class="nav-right">ข้อมูล 2015–2025</div>
-</nav>
-
-<!-- ══════════════════════ TEAM PAGE ══════════════════════ -->
-<div class="page active" id="page-team">
-  <div class="filters">
-    <label>ซีซัน</label>
-    <select id="f-season" onchange="renderTeam()">
-      <option value="">ทั้งหมด</option>
-    </select>
-    <label>ประเภท</label>
-    <select id="f-comp" onchange="renderTeam()">
-      <option value="">ทั้งหมด</option>
-      <option value="League">League</option>
-      <option value="Cup">Cup</option>
-    </select>
-    <label>สนาม</label>
-    <select id="f-venue" onchange="renderTeam()">
-      <option value="">ทั้งหมด</option>
-      <option value="H">เหย้า</option>
-      <option value="A">เยือน</option>
-    </select>
-  </div>
-
-  <div class="metrics" id="team-metrics"></div>
-
-  <div class="grid-3">
-    <div class="card">
-      <div class="card-title">ผลแพ้ชนะรายซีซัน</div>
-      <canvas id="chart-season" height="200"></canvas>
-    </div>
-    <div class="card">
-      <div class="card-title">เหย้า vs เยือน</div>
-      <canvas id="chart-venue" height="200"></canvas>
-    </div>
-    <div class="card">
-      <div class="card-title">W/D/L รวม</div>
-      <canvas id="chart-wdl" height="200"></canvas>
-    </div>
-  </div>
-
-  <div class="card" style="margin-bottom:16px">
-    <div class="card-title">ประตูได้ vs ประตูเสีย รายซีซัน</div>
-    <canvas id="chart-goals" height="120"></canvas>
-  </div>
-
-  <div class="card">
-    <div class="card-title">ผลการแข่งขัน</div>
-    <div style="margin-bottom:10px;display:flex;gap:8px">
-      <input type="text" id="match-search" placeholder="ค้นหาทีม..." oninput="renderMatchTable()">
-      <select id="f-result" onchange="renderMatchTable()" style="width:auto">
-        <option value="">ผลทั้งหมด</option>
-        <option value="W">ชนะ</option>
-        <option value="D">เสมอ</option>
-        <option value="L">แพ้</option>
-      </select>
-    </div>
-    <div class="tbl-wrap">
-      <table>
-        <thead><tr>
-          <th>วันที่</th><th>นัด</th><th>คู่แข่ง</th><th>สนาม</th>
-          <th class="num">GF</th><th class="num">GA</th><th>ผล</th><th class="num">แต้ม</th>
-        </tr></thead>
-        <tbody id="match-tbody"></tbody>
-      </table>
-    </div>
-    <div id="match-count" style="font-size:11px;color:var(--muted);margin-top:8px;text-align:right"></div>
-  </div>
+<div class="topbar">
+  <div class="topbar-logo">⚽ <em>Chamchuri</em> United</div>
+  <div class="topbar-right">ข้อมูล 2015–2025 · 155 นักเตะ</div>
 </div>
 
-<!-- ══════════════════════ PLAYER PAGE ══════════════════════ -->
-<div class="page" id="page-player">
-  <div class="filters">
-    <label>ตำแหน่ง</label>
-    <select id="fp-pos" onchange="renderPlayer()">
-      <option value="">ทั้งหมด</option>
-      <option value="GK">GK</option>
-      <option value="DF">DF</option>
-      <option value="MF">MF</option>
-      <option value="FC">FC</option>
-    </select>
-    <label>ซีซัน</label>
-    <select id="fp-season" onchange="renderPlayer()">
-      <option value="">ทั้งหมด</option>
-    </select>
-    <label>เรียงตาม</label>
-    <select id="fp-sort" onchange="renderPlayer()">
-      <option value="apps">นัดที่ลง</option>
-      <option value="g">ประตู</option>
-      <option value="a">แอสซิสต์</option>
-      <option value="gc">Goal Contributions</option>
-    </select>
-    <input type="text" id="player-search" placeholder="ค้นหานักเตะ..." oninput="renderPlayer()" style="margin-left:auto">
-  </div>
+<div class="filters" id="filter-strip">
+  <label>นักเตะ</label>
+  <select id="sel-player" onchange="onPlayerChange()">
+    <option value="">— เลือกนักเตะ —</option>
+  </select>
+  <label>เทียบกับ</label>
+  <select id="sel-compare" onchange="render()">
+    <option value="">— เปรียบเทียบ —</option>
+  </select>
+  <label>ตำแหน่ง</label>
+  <select id="sel-pos" onchange="filterPlayerList()">
+    <option value="">ทั้งหมด</option>
+    <option value="GK">GK</option>
+    <option value="DF">DF</option>
+    <option value="MF">MF</option>
+    <option value="FC">FC</option>
+  </select>
+  <label>ค้นหา</label>
+  <input type="text" id="search-input" placeholder="ชื่อ / ชื่อเล่น..." oninput="filterPlayerList()">
+  <button class="clear-btn" onclick="clearAll()">ล้าง</button>
+  <span class="result-count" id="result-count"></span>
+</div>
 
-  <div class="metrics" id="player-metrics"></div>
-
-  <div class="grid-2" style="margin-bottom:16px">
-    <div class="card">
-      <div class="card-title">Top 10 — นัดที่ลงสนาม</div>
-      <canvas id="chart-top-apps" height="220"></canvas>
-    </div>
-    <div class="card">
-      <div class="card-title">Top 10 — ประตู + แอสซิสต์</div>
-      <canvas id="chart-top-gc" height="220"></canvas>
-    </div>
-  </div>
-
-  <div class="grid-2" style="margin-bottom:16px">
-    <div class="card">
-      <div class="card-title">สัดส่วนตำแหน่ง</div>
-      <canvas id="chart-pos" height="180"></canvas>
-    </div>
-    <div class="card">
-      <div class="card-title">Starter vs Sub</div>
-      <canvas id="chart-app-type" height="180"></canvas>
-    </div>
-  </div>
-
-  <div class="card">
-    <div class="card-title">สถิตินักเตะ</div>
-    <div class="tbl-wrap">
-      <table>
-        <thead><tr>
-          <th>#</th><th>ชื่อเล่น</th><th>ชื่อจริง</th><th>ตำแหน่ง</th>
-          <th class="num">นัด</th><th class="num">ตัวจริง</th><th class="num">สำรอง</th>
-          <th class="num">ประตู</th><th class="num">แอสซิสต์</th><th class="num">G+A</th>
-        </tr></thead>
-        <tbody id="player-tbody"></tbody>
-      </table>
-    </div>
-    <div id="player-count" style="font-size:11px;color:var(--muted);margin-top:8px;text-align:right"></div>
+<div class="wrap" id="main-wrap">
+  <div class="empty">
+    <h2>เลือกนักเตะ</h2>
+    <p>เลือกชื่อจาก dropdown ด้านบน หรือพิมพ์ค้นหาได้เลย</p>
   </div>
 </div>
 
 <script>
-/* ── DATA ─────────────────────────────────────────────────── */
-const TS = [{"match_id":"S15-01","season":2015,"competition":"League","stage":"League","date":"2015-02-15","venue":"A","opponent":"Army FC","result":"L","gf":1,"ga":3,"pts":0,"stype":"League"},{"match_id":"S15-02","season":2015,"competition":"League","stage":"League","date":"2015-03-01","venue":"H","opponent":"Rangsit FC","result":"W","gf":3,"ga":0,"pts":3,"stype":"League"},{"match_id":"S15-03","season":2015,"competition":"League","stage":"League","date":"2015-03-08","venue":"A","opponent":"North Bangkok","result":"D","gf":1,"ga":1,"pts":1,"stype":"League"},{"match_id":"S15-04","season":2015,"competition":"League","stage":"League","date":"2015-03-15","venue":"H","opponent":"ABAC FC","result":"W","gf":4,"ga":1,"pts":3,"stype":"League"},{"match_id":"S15-05","season":2015,"competition":"League","stage":"League","date":"2015-03-22","venue":"A","opponent":"Rajamangala","result":"W","gf":2,"ga":1,"pts":3,"stype":"League"},{"match_id":"S15-06","season":2015,"competition":"League","stage":"League","date":"2015-03-29","venue":"H","opponent":"Army FC","result":"L","gf":0,"ga":2,"pts":0,"stype":"League"},{"match_id":"S15-07","season":2015,"competition":"League","stage":"League","date":"2015-04-05","venue":"A","opponent":"Rangsit FC","result":"W","gf":2,"ga":0,"pts":3,"stype":"League"},{"match_id":"S15-08","season":2015,"competition":"League","stage":"League","date":"2015-04-12","venue":"H","opponent":"North Bangkok","result":"W","gf":3,"ga":1,"pts":3,"stype":"League"},{"match_id":"S15-09","season":2015,"competition":"League","stage":"League","date":"2015-04-19","venue":"A","opponent":"ABAC FC","result":"D","gf":2,"ga":2,"pts":1,"stype":"League"},{"match_id":"S15-10","season":2015,"competition":"League","stage":"League","date":"2015-04-26","venue":"H","opponent":"Rajamangala","result":"W","gf":1,"ga":0,"pts":3,"stype":"League"},{"match_id":"S15-11","season":2015,"competition":"League","stage":"League","date":"2015-05-03","venue":"A","opponent":"KU FC","result":"L","gf":1,"ga":3,"pts":0,"stype":"League"},{"match_id":"S15-12","season":2015,"competition":"League","stage":"League","date":"2015-05-10","venue":"H","opponent":"Assumption FC","result":"W","gf":5,"ga":2,"pts":3,"stype":"League"},{"match_id":"S15-13","season":2015,"competition":"League","stage":"League","date":"2015-05-17","venue":"A","opponent":"Thammasat FC","result":"L","gf":0,"ga":1,"pts":0,"stype":"League"},{"match_id":"S15-14","season":2015,"competition":"League","stage":"League","date":"2015-05-24","venue":"H","opponent":"KU FC","result":"W","gf":2,"ga":1,"pts":3,"stype":"League"},{"match_id":"S15-15","season":2015,"competition":"League","stage":"League","date":"2015-05-31","venue":"A","opponent":"Assumption FC","result":"L","gf":1,"ga":2,"pts":0,"stype":"League"},{"match_id":"S15-16","season":2015,"competition":"League","stage":"League","date":"2015-06-07","venue":"H","opponent":"Thammasat FC","result":"W","gf":3,"ga":0,"pts":3,"stype":"League"},{"match_id":"S15-17","season":2015,"competition":"League","stage":"League","date":"2015-06-14","venue":"A","opponent":"Silpakorn FC","result":"W","gf":2,"ga":1,"pts":3,"stype":"League"},{"match_id":"S15-18","season":2015,"competition":"League","stage":"League","date":"2015-06-21","venue":"H","opponent":"Mahidol FC","result":"D","gf":1,"ga":1,"pts":1,"stype":"League"},{"match_id":"S15-19","season":2015,"competition":"League","stage":"League","date":"2015-07-05","venue":"A","opponent":"Mahidol FC","result":"L","gf":0,"ga":1,"pts":0,"stype":"League"},{"match_id":"S15-20","season":2015,"competition":"League","stage":"League","date":"2015-07-12","venue":"H","opponent":"Silpakorn FC","result":"W","gf":2,"ga":0,"pts":3,"stype":"League"},{"match_id":"S15-21","season":2015,"competition":"League","stage":"League","date":"2015-07-19","venue":"A","opponent":"Army FC","result":"L","gf":1,"ga":4,"pts":0,"stype":"League"},{"match_id":"S15-22","season":2015,"competition":"League","stage":"League","date":"2015-07-26","venue":"H","opponent":"KU FC","result":"W","gf":3,"ga":2,"pts":3,"stype":"League"},{"match_id":"S15-23","season":2015,"competition":"League","stage":"League","date":"2015-08-09","venue":"A","opponent":"North Bangkok","result":"L","gf":0,"ga":1,"pts":0,"stype":"League"},{"match_id":"S15-24","season":2015,"competition":"League","stage":"League","date":"2015-08-16","venue":"H","opponent":"ABAC FC","result":"W","gf":4,"ga":0,"pts":3,"stype":"League"},{"match_id":"S15-25","season":2015,"competition":"League","stage":"League","date":"2015-08-23","venue":"A","opponent":"Rajamangala","result":"L","gf":2,"ga":3,"pts":0,"stype":"League"},{"match_id":"S15-26","season":2015,"competition":"League","stage":"League","date":"2015-09-26","venue":"H","opponent":"Army FC","result":"D","gf":2,"ga":2,"pts":1,"stype":"League"},{"match_id":"s15-P1","season":2015,"competition":"League","stage":"Playoff","date":"2015-10-11","venue":"H","opponent":"North Bangkok","result":"W","gf":3,"ga":1,"pts":3,"stype":"League"},{"match_id":"s15-P2","season":2015,"competition":"League","stage":"Playoff","date":"2015-10-18","venue":"A","opponent":"North Bangkok","result":"D","gf":1,"ga":1,"pts":1,"stype":"League"},{"match_id":"s15-P3","season":2015,"competition":"League","stage":"Playoff","date":"2015-10-25","venue":"H","opponent":"KU FC","result":"W","gf":2,"ga":0,"pts":3,"stype":"League"},{"match_id":"s15-P4","season":2015,"competition":"League","stage":"Playoff","date":"2015-11-01","venue":"A","opponent":"KU FC","result":"L","gf":0,"ga":1,"pts":0,"stype":"League"},{"match_id":"s15-P5","season":2015,"competition":"League","stage":"Playoff","date":"2015-11-08","venue":"H","opponent":"Army FC","result":"W","gf":1,"ga":0,"pts":3,"stype":"League"},{"match_id":"s15-P6","season":2015,"competition":"League","stage":"Playoff","date":"2015-11-15","venue":"A","opponent":"Army FC","result":"L","gf":1,"ga":2,"pts":0,"stype":"League"},{"match_id":"s15-P7","season":2015,"competition":"League","stage":"Final","date":"2015-11-22","venue":"N","opponent":"Rangsit FC","result":"W","gf":2,"ga":1,"pts":3,"stype":"League"},{"match_id":"s15-P8","season":2015,"competition":"League","stage":"Final","date":"2015-11-29","venue":"N","opponent":"Rangsit FC","result":"L","gf":0,"ga":1,"pts":0,"stype":"League"},{"match_id":"s15-P9","season":2015,"competition":"League","stage":"Final","date":"2015-12-06","venue":"N","opponent":"Rangsit FC","result":"W","gf":3,"ga":2,"pts":3,"stype":"League"},{"match_id":"s15-P10","season":2015,"competition":"League","stage":"Playoff","date":"2015-12-13","venue":"N","opponent":"KU FC","result":"L","gf":1,"ga":2,"pts":0,"stype":"League"},{"match_id":"C23-01","season":2023,"competition":"Cup","stage":"Round 1","date":"2023-03-05","venue":"H","opponent":"Rangsit FC","result":"W","gf":3,"ga":0,"pts":3,"stype":"Cup"},{"match_id":"C24-01","season":2024,"competition":"Cup","stage":"Round 1","date":"2024-02-18","venue":"H","opponent":"ABAC FC","result":"W","gf":4,"ga":1,"pts":3,"stype":"Cup"},{"match_id":"C24-02","season":2024,"competition":"Cup","stage":"Quarter Final","date":"2024-03-10","venue":"A","opponent":"Army FC","result":"D","gf":1,"ga":1,"pts":1,"stype":"Cup"},{"match_id":"C24-03","season":2024,"competition":"Cup","stage":"Semi Final","date":"2024-04-07","venue":"N","opponent":"KU FC","result":"L","gf":0,"ga":1,"pts":0,"stype":"Cup"},{"match_id":"C25-01","season":2025,"competition":"Cup","stage":"Round 1","date":"2025-02-16","venue":"H","opponent":"Thammasat FC","result":"W","gf":2,"ga":0,"pts":3,"stype":"Cup"}];
+const RAW = [{"pc": "P069", "nick": "ฟรองค์", "name": "กษิตินาถ ศรีภิรมย์", "pos": "FC", "seasons": [2017, 2018, 2019, 2020, 2021, 2022, 2023, 2025], "total": {"apps": 128, "starts": 68, "subs": 60, "g": 29, "a": 8, "W": 41, "D": 36, "L": 51}, "by_season": {"2017": {"apps": 14, "starts": 4, "subs": 10, "g": 8, "a": 0, "W": 8, "D": 1, "L": 5}, "2018": {"apps": 24, "starts": 9, "subs": 15, "g": 8, "a": 0, "W": 11, "D": 4, "L": 9}, "2019": {"apps": 20, "starts": 10, "subs": 10, "g": 2, "a": 0, "W": 3, "D": 6, "L": 11}, "2020": {"apps": 8, "starts": 4, "subs": 4, "g": 1, "a": 0, "W": 4, "D": 3, "L": 1}, "2021": {"apps": 16, "starts": 10, "subs": 6, "g": 3, "a": 1, "W": 6, "D": 7, "L": 3}, "2022": {"apps": 15, "starts": 7, "subs": 8, "g": 1, "a": 2, "W": 3, "D": 6, "L": 6}, "2023": {"apps": 24, "starts": 21, "subs": 3, "g": 6, "a": 2, "W": 4, "D": 8, "L": 12}, "2025": {"apps": 7, "starts": 3, "subs": 4, "g": 0, "a": 3, "W": 2, "D": 1, "L": 4}}, "by_comp": {"League": {"apps": 127, "starts": 67, "subs": 60, "g": 29, "a": 8, "W": 41, "D": 36, "L": 50}, "Cup": {"apps": 1, "starts": 1, "subs": 0, "g": 0, "a": 0, "W": 0, "D": 0, "L": 1}}, "as_starter": {"W": 21, "D": 22, "L": 25}, "as_sub": {"W": 20, "D": 14, "L": 26}}, {"pc": "P094", "nick": "ปอ", "name": "ปราชญ์ปรีชา เพชรทอง", "pos": "FC", "seasons": [2020, 2021, 2022, 2023, 2024], "total": {"apps": 104, "starts": 89, "subs": 15, "g": 14, "a": 12, "W": 40, "D": 28, "L": 36}, "by_season": {"2020": {"apps": 7, "starts": 1, "subs": 6, "g": 1, "a": 0, "W": 6, "D": 0, "L": 1}, "2021": {"apps": 26, "starts": 22, "subs": 4, "g": 6, "a": 1, "W": 12, "D": 10, "L": 4}, "2022": {"apps": 24, "starts": 22, "subs": 2, "g": 1, "a": 5, "W": 9, "D": 7, "L": 8}, "2023": {"apps": 24, "starts": 23, "subs": 1, "g": 3, "a": 4, "W": 6, "D": 6, "L": 12}, "2024": {"apps": 23, "starts": 21, "subs": 2, "g": 3, "a": 2, "W": 7, "D": 5, "L": 11}}, "by_comp": {"League": {"apps": 99, "starts": 85, "subs": 14, "g": 14, "a": 11, "W": 39, "D": 28, "L": 32}, "Cup": {"apps": 5, "starts": 4, "subs": 1, "g": 0, "a": 1, "W": 1, "D": 0, "L": 4}}, "as_starter": {"W": 31, "D": 25, "L": 33}, "as_sub": {"W": 9, "D": 3, "L": 3}}, {"pc": "P013", "nick": "ตะวัน", "name": "ตะวัน สังขวิมล", "pos": "MF", "seasons": [2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022], "total": {"apps": 100, "starts": 59, "subs": 41, "g": 5, "a": 9, "W": 44, "D": 25, "L": 31}, "by_season": {"2015": {"apps": 14, "starts": 10, "subs": 4, "g": 1, "a": 1, "W": 10, "D": 1, "L": 3}, "2016": {"apps": 6, "starts": 1, "subs": 5, "g": 0, "a": 0, "W": 3, "D": 2, "L": 1}, "2017": {"apps": 22, "starts": 19, "subs": 3, "g": 2, "a": 2, "W": 9, "D": 5, "L": 8}, "2018": {"apps": 17, "starts": 9, "subs": 8, "g": 0, "a": 3, "W": 7, "D": 3, "L": 7}, "2019": {"apps": 14, "starts": 10, "subs": 4, "g": 2, "a": 3, "W": 1, "D": 6, "L": 7}, "2020": {"apps": 12, "starts": 1, "subs": 11, "g": 0, "a": 0, "W": 6, "D": 3, "L": 3}, "2021": {"apps": 5, "starts": 0, "subs": 5, "g": 0, "a": 0, "W": 2, "D": 2, "L": 1}, "2022": {"apps": 10, "starts": 9, "subs": 1, "g": 0, "a": 0, "W": 6, "D": 3, "L": 1}}, "by_comp": {"League": {"apps": 100, "starts": 59, "subs": 41, "g": 5, "a": 9, "W": 44, "D": 25, "L": 31}}, "as_starter": {"W": 26, "D": 15, "L": 18}, "as_sub": {"W": 18, "D": 10, "L": 13}}, {"pc": "P038", "nick": "ป๊อก", "name": "พนมกรณ์ สายสอน", "pos": "MF", "seasons": [2015, 2016, 2017, 2018, 2019], "total": {"apps": 99, "starts": 81, "subs": 18, "g": 7, "a": 20, "W": 42, "D": 26, "L": 31}, "by_season": {"2015": {"apps": 17, "starts": 17, "subs": 0, "g": 1, "a": 1, "W": 5, "D": 4, "L": 8}, "2016": {"apps": 19, "starts": 17, "subs": 2, "g": 2, "a": 7, "W": 12, "D": 6, "L": 1}, "2017": {"apps": 25, "starts": 23, "subs": 2, "g": 2, "a": 8, "W": 11, "D": 5, "L": 9}, "2018": {"apps": 23, "starts": 16, "subs": 7, "g": 0, "a": 3, "W": 10, "D": 5, "L": 8}, "2019": {"apps": 15, "starts": 8, "subs": 7, "g": 2, "a": 1, "W": 4, "D": 6, "L": 5}}, "by_comp": {"League": {"apps": 99, "starts": 81, "subs": 18, "g": 7, "a": 20, "W": 42, "D": 26, "L": 31}}, "as_starter": {"W": 33, "D": 21, "L": 27}, "as_sub": {"W": 9, "D": 5, "L": 4}}, {"pc": "P068", "nick": "ไฟฟ์", "name": "ณัฐวัฒน์ โทบ้านซ้ง", "pos": "DF", "seasons": [2017, 2018, 2019, 2020, 2021], "total": {"apps": 98, "starts": 84, "subs": 14, "g": 5, "a": 24, "W": 43, "D": 26, "L": 29}, "by_season": {"2017": {"apps": 17, "starts": 9, "subs": 8, "g": 2, "a": 0, "W": 6, "D": 4, "L": 7}, "2018": {"apps": 13, "starts": 9, "subs": 4, "g": 1, "a": 3, "W": 7, "D": 1, "L": 5}, "2019": {"apps": 24, "starts": 23, "subs": 1, "g": 0, "a": 6, "W": 7, "D": 8, "L": 9}, "2020": {"apps": 19, "starts": 18, "subs": 1, "g": 0, "a": 6, "W": 11, "D": 4, "L": 4}, "2021": {"apps": 25, "starts": 25, "subs": 0, "g": 2, "a": 9, "W": 12, "D": 9, "L": 4}}, "by_comp": {"League": {"apps": 98, "starts": 84, "subs": 14, "g": 5, "a": 24, "W": 43, "D": 26, "L": 29}}, "as_starter": {"W": 36, "D": 24, "L": 24}, "as_sub": {"W": 7, "D": 2, "L": 5}}, {"pc": "P102", "nick": "กอล์ฟ", "name": "พรหมมินทร์ ปิ่นแก้ว", "pos": "MF", "seasons": [2021, 2022, 2023, 2024], "total": {"apps": 82, "starts": 69, "subs": 13, "g": 5, "a": 7, "W": 29, "D": 23, "L": 30}, "by_season": {"2021": {"apps": 20, "starts": 14, "subs": 6, "g": 1, "a": 1, "W": 10, "D": 8, "L": 2}, "2022": {"apps": 23, "starts": 20, "subs": 3, "g": 1, "a": 3, "W": 9, "D": 6, "L": 8}, "2023": {"apps": 23, "starts": 22, "subs": 1, "g": 2, "a": 3, "W": 5, "D": 6, "L": 12}, "2024": {"apps": 16, "starts": 13, "subs": 3, "g": 1, "a": 0, "W": 5, "D": 3, "L": 8}}, "by_comp": {"League": {"apps": 81, "starts": 68, "subs": 13, "g": 5, "a": 7, "W": 29, "D": 23, "L": 29}, "Cup": {"apps": 1, "starts": 1, "subs": 0, "g": 0, "a": 0, "W": 0, "D": 0, "L": 1}}, "as_starter": {"W": 23, "D": 17, "L": 29}, "as_sub": {"W": 6, "D": 6, "L": 1}}, {"pc": "P054", "nick": "ปิ๊ก", "name": "กริชชัย แสงรุ่ง", "pos": "GK", "seasons": [2016, 2017, 2018, 2019, 2020, 2021], "total": {"apps": 78, "starts": 78, "subs": 0, "g": 0, "a": 1, "W": 36, "D": 19, "L": 23}, "by_season": {"2016": {"apps": 9, "starts": 9, "subs": 0, "g": 0, "a": 0, "W": 6, "D": 2, "L": 1}, "2017": {"apps": 13, "starts": 13, "subs": 0, "g": 0, "a": 0, "W": 4, "D": 3, "L": 6}, "2018": {"apps": 11, "starts": 11, "subs": 0, "g": 0, "a": 0, "W": 7, "D": 0, "L": 4}, "2019": {"apps": 20, "starts": 20, "subs": 0, "g": 0, "a": 0, "W": 7, "D": 5, "L": 8}, "2020": {"apps": 16, "starts": 16, "subs": 0, "g": 0, "a": 0, "W": 8, "D": 5, "L": 3}, "2021": {"apps": 9, "starts": 9, "subs": 0, "g": 0, "a": 1, "W": 4, "D": 4, "L": 1}}, "by_comp": {"League": {"apps": 78, "starts": 78, "subs": 0, "g": 0, "a": 1, "W": 36, "D": 19, "L": 23}}, "as_starter": {"W": 36, "D": 19, "L": 23}, "as_sub": {"W": 0, "D": 0, "L": 0}}, {"pc": "P090", "nick": "เบนเก้น", "name": "Mbengen", "pos": "FC", "seasons": [2019, 2020, 2021, 2022], "total": {"apps": 78, "starts": 74, "subs": 4, "g": 31, "a": 22, "W": 38, "D": 23, "L": 17}, "by_season": {"2019": {"apps": 9, "starts": 9, "subs": 0, "g": 8, "a": 1, "W": 6, "D": 1, "L": 2}, "2020": {"apps": 21, "starts": 21, "subs": 0, "g": 9, "a": 8, "W": 12, "D": 6, "L": 3}, "2021": {"apps": 24, "starts": 23, "subs": 1, "g": 10, "a": 9, "W": 11, "D": 9, "L": 4}, "2022": {"apps": 24, "starts": 21, "subs": 3, "g": 4, "a": 4, "W": 9, "D": 7, "L": 8}}, "by_comp": {"League": {"apps": 78, "starts": 74, "subs": 4, "g": 31, "a": 22, "W": 38, "D": 23, "L": 17}}, "as_starter": {"W": 38, "D": 20, "L": 16}, "as_sub": {"W": 0, "D": 3, "L": 1}}, {"pc": "P063", "nick": "แมน", "name": "ประกายเกียรติ สุขคง", "pos": "MF", "seasons": [2017, 2018, 2019, 2020, 2021], "total": {"apps": 76, "starts": 69, "subs": 7, "g": 9, "a": 10, "W": 34, "D": 23, "L": 19}, "by_season": {"2017": {"apps": 3, "starts": 0, "subs": 3, "g": 1, "a": 0, "W": 3, "D": 0, "L": 0}, "2018": {"apps": 5, "starts": 4, "subs": 1, "g": 1, "a": 1, "W": 4, "D": 1, "L": 0}, "2019": {"apps": 24, "starts": 22, "subs": 2, "g": 1, "a": 1, "W": 6, "D": 7, "L": 11}, "2020": {"apps": 22, "starts": 22, "subs": 0, "g": 3, "a": 6, "W": 12, "D": 6, "L": 4}, "2021": {"apps": 22, "starts": 21, "subs": 1, "g": 3, "a": 2, "W": 9, "D": 9, "L": 4}}, "by_comp": {"League": {"apps": 76, "starts": 69, "subs": 7, "g": 9, "a": 10, "W": 34, "D": 23, "L": 19}}, "as_starter": {"W": 29, "D": 23, "L": 17}, "as_sub": {"W": 5, "D": 0, "L": 2}}, {"pc": "P058", "nick": "ไมค์", "name": "ศักดิ์สิทธิ์ จิตวิจารณ์", "pos": "DF", "seasons": [2016, 2017, 2018, 2019, 2020], "total": {"apps": 75, "starts": 72, "subs": 3, "g": 7, "a": 1, "W": 31, "D": 18, "L": 26}, "by_season": {"2016": {"apps": 3, "starts": 1, "subs": 2, "g": 0, "a": 0, "W": 1, "D": 1, "L": 1}, "2017": {"apps": 20, "starts": 19, "subs": 1, "g": 1, "a": 0, "W": 10, "D": 4, "L": 6}, "2018": {"apps": 24, "starts": 24, "subs": 0, "g": 2, "a": 0, "W": 11, "D": 5, "L": 8}, "2019": {"apps": 26, "starts": 26, "subs": 0, "g": 4, "a": 1, "W": 7, "D": 8, "L": 11}, "2020": {"apps": 2, "starts": 2, "subs": 0, "g": 0, "a": 0, "W": 2, "D": 0, "L": 0}}, "by_comp": {"League": {"apps": 75, "starts": 72, "subs": 3, "g": 7, "a": 1, "W": 31, "D": 18, "L": 26}}, "as_starter": {"W": 29, "D": 17, "L": 26}, "as_sub": {"W": 2, "D": 1, "L": 0}}, {"pc": "P034", "nick": "เต้ย", "name": "ภูษิต ศรีดอกพุฒ", "pos": "DF", "seasons": [2015, 2016, 2017, 2018, 2019, 2020], "total": {"apps": 73, "starts": 66, "subs": 7, "g": 1, "a": 4, "W": 33, "D": 19, "L": 21}, "by_season": {"2015": {"apps": 3, "starts": 0, "subs": 3, "g": 0, "a": 0, "W": 3, "D": 0, "L": 0}, "2016": {"apps": 9, "starts": 9, "subs": 0, "g": 0, "a": 0, "W": 6, "D": 1, "L": 2}, "2017": {"apps": 23, "starts": 23, "subs": 0, "g": 1, "a": 0, "W": 8, "D": 6, "L": 9}, "2018": {"apps": 7, "starts": 5, "subs": 2, "g": 0, "a": 0, "W": 5, "D": 1, "L": 1}, "2019": {"apps": 11, "starts": 9, "subs": 2, "g": 0, "a": 0, "W": 1, "D": 5, "L": 5}, "2020": {"apps": 20, "starts": 20, "subs": 0, "g": 0, "a": 4, "W": 10, "D": 6, "L": 4}}, "by_comp": {"League": {"apps": 73, "starts": 66, "subs": 7, "g": 1, "a": 4, "W": 33, "D": 19, "L": 21}}, "as_starter": {"W": 28, "D": 18, "L": 20}, "as_sub": {"W": 5, "D": 1, "L": 1}}, {"pc": "P045", "nick": "Sugi", "name": "Hiroyuki Sugimoto", "pos": "FC", "seasons": [2016, 2017, 2018], "total": {"apps": 71, "starts": 64, "subs": 7, "g": 26, "a": 14, "W": 35, "D": 17, "L": 19}, "by_season": {"2016": {"apps": 21, "starts": 17, "subs": 4, "g": 7, "a": 8, "W": 13, "D": 6, "L": 2}, "2017": {"apps": 24, "starts": 23, "subs": 1, "g": 13, "a": 5, "W": 10, "D": 6, "L": 8}, "2018": {"apps": 26, "starts": 24, "subs": 2, "g": 6, "a": 1, "W": 12, "D": 5, "L": 9}}, "by_comp": {"League": {"apps": 71, "starts": 64, "subs": 7, "g": 26, "a": 14, "W": 35, "D": 17, "L": 19}}, "as_starter": {"W": 31, "D": 15, "L": 18}, "as_sub": {"W": 4, "D": 2, "L": 1}}, {"pc": "P053", "nick": "ฟีฟ่า", "name": "พีรณัฐ ซื่อมาก", "pos": "MF", "seasons": [2016, 2017, 2018, 2019, 2020], "total": {"apps": 71, "starts": 42, "subs": 29, "g": 3, "a": 6, "W": 32, "D": 15, "L": 24}, "by_season": {"2016": {"apps": 7, "starts": 3, "subs": 4, "g": 0, "a": 1, "W": 7, "D": 0, "L": 0}, "2017": {"apps": 21, "starts": 10, "subs": 11, "g": 2, "a": 4, "W": 8, "D": 5, "L": 8}, "2018": {"apps": 20, "starts": 15, "subs": 5, "g": 1, "a": 1, "W": 8, "D": 4, "L": 8}, "2019": {"apps": 14, "starts": 8, "subs": 6, "g": 0, "a": 0, "W": 3, "D": 4, "L": 7}, "2020": {"apps": 9, "starts": 6, "subs": 3, "g": 0, "a": 0, "W": 6, "D": 2, "L": 1}}, "by_comp": {"League": {"apps": 71, "starts": 42, "subs": 29, "g": 3, "a": 6, "W": 32, "D": 15, "L": 24}}, "as_starter": {"W": 21, "D": 7, "L": 14}, "as_sub": {"W": 11, "D": 8, "L": 10}}, {"pc": "P103", "nick": "เซฟตี้", "name": "วรเดช บุญมาขจรกิจ", "pos": "MF", "seasons": [2021, 2022, 2023, 2024, 2025], "total": {"apps": 71, "starts": 34, "subs": 37, "g": 9, "a": 2, "W": 23, "D": 16, "L": 32}, "by_season": {"2021": {"apps": 9, "starts": 1, "subs": 8, "g": 2, "a": 0, "W": 5, "D": 3, "L": 1}, "2022": {"apps": 10, "starts": 3, "subs": 7, "g": 1, "a": 0, "W": 3, "D": 2, "L": 5}, "2023": {"apps": 16, "starts": 4, "subs": 12, "g": 0, "a": 0, "W": 3, "D": 4, "L": 9}, "2024": {"apps": 18, "starts": 9, "subs": 9, "g": 1, "a": 2, "W": 6, "D": 3, "L": 9}, "2025": {"apps": 18, "starts": 17, "subs": 1, "g": 5, "a": 0, "W": 6, "D": 4, "L": 8}}, "by_comp": {"League": {"apps": 64, "starts": 29, "subs": 35, "g": 9, "a": 2, "W": 22, "D": 15, "L": 27}, "Cup": {"apps": 7, "starts": 5, "subs": 2, "g": 0, "a": 0, "W": 1, "D": 1, "L": 5}}, "as_starter": {"W": 10, "D": 7, "L": 17}, "as_sub": {"W": 13, "D": 9, "L": 15}}, {"pc": "P098", "nick": "หมัด", "name": "อะหมัด หีมเบญหมัด", "pos": "DF", "seasons": [2020, 2021, 2022, 2023, 2024], "total": {"apps": 70, "starts": 54, "subs": 16, "g": 4, "a": 6, "W": 26, "D": 20, "L": 24}, "by_season": {"2020": {"apps": 3, "starts": 2, "subs": 1, "g": 1, "a": 0, "W": 2, "D": 1, "L": 0}, "2021": {"apps": 19, "starts": 18, "subs": 1, "g": 1, "a": 1, "W": 7, "D": 10, "L": 2}, "2022": {"apps": 23, "starts": 20, "subs": 3, "g": 1, "a": 4, "W": 9, "D": 7, "L": 7}, "2023": {"apps": 9, "starts": 5, "subs": 4, "g": 0, "a": 0, "W": 4, "D": 0, "L": 5}, "2024": {"apps": 16, "starts": 9, "subs": 7, "g": 1, "a": 1, "W": 4, "D": 2, "L": 10}}, "by_comp": {"League": {"apps": 66, "starts": 50, "subs": 16, "g": 3, "a": 6, "W": 25, "D": 20, "L": 21}, "Cup": {"apps": 4, "starts": 4, "subs": 0, "g": 1, "a": 0, "W": 1, "D": 0, "L": 3}}, "as_starter": {"W": 18, "D": 19, "L": 17}, "as_sub": {"W": 8, "D": 1, "L": 7}}, {"pc": "P129", "nick": "เนส", "name": "วัชรพงษ์ วันทอง", "pos": "MF", "seasons": [2022, 2023, 2024, 2025], "total": {"apps": 70, "starts": 50, "subs": 20, "g": 13, "a": 8, "W": 24, "D": 19, "L": 27}, "by_season": {"2022": {"apps": 8, "starts": 3, "subs": 5, "g": 2, "a": 0, "W": 5, "D": 2, "L": 1}, "2023": {"apps": 24, "starts": 14, "subs": 10, "g": 0, "a": 1, "W": 6, "D": 7, "L": 11}, "2024": {"apps": 20, "starts": 15, "subs": 5, "g": 6, "a": 1, "W": 6, "D": 5, "L": 9}, "2025": {"apps": 18, "starts": 18, "subs": 0, "g": 5, "a": 6, "W": 7, "D": 5, "L": 6}}, "by_comp": {"League": {"apps": 65, "starts": 45, "subs": 20, "g": 11, "a": 8, "W": 23, "D": 18, "L": 24}, "Cup": {"apps": 5, "starts": 5, "subs": 0, "g": 2, "a": 0, "W": 1, "D": 1, "L": 3}}, "as_starter": {"W": 19, "D": 12, "L": 19}, "as_sub": {"W": 5, "D": 7, "L": 8}}, {"pc": "P066", "nick": "เน็ตตี้", "name": "พนมพร พวงมาลัย", "pos": "MF", "seasons": [2017, 2018, 2019, 2020, 2021, 2023], "total": {"apps": 69, "starts": 61, "subs": 8, "g": 4, "a": 2, "W": 28, "D": 22, "L": 19}, "by_season": {"2017": {"apps": 1, "starts": 1, "subs": 0, "g": 0, "a": 0, "W": 1, "D": 0, "L": 0}, "2018": {"apps": 4, "starts": 2, "subs": 2, "g": 0, "a": 0, "W": 3, "D": 0, "L": 1}, "2019": {"apps": 11, "starts": 6, "subs": 5, "g": 1, "a": 0, "W": 3, "D": 3, "L": 5}, "2020": {"apps": 20, "starts": 20, "subs": 0, "g": 1, "a": 0, "W": 11, "D": 6, "L": 3}, "2021": {"apps": 13, "starts": 13, "subs": 0, "g": 0, "a": 1, "W": 5, "D": 7, "L": 1}, "2023": {"apps": 20, "starts": 19, "subs": 1, "g": 2, "a": 1, "W": 5, "D": 6, "L": 9}}, "by_comp": {"League": {"apps": 69, "starts": 61, "subs": 8, "g": 4, "a": 2, "W": 28, "D": 22, "L": 19}}, "as_starter": {"W": 23, "D": 21, "L": 17}, "as_sub": {"W": 5, "D": 1, "L": 2}}, {"pc": "P075", "nick": "อู๋", "name": "ภีมปภพ วิริยะชาญชัย", "pos": "MF", "seasons": [2018, 2019, 2020, 2021], "total": {"apps": 66, "starts": 38, "subs": 28, "g": 7, "a": 9, "W": 23, "D": 24, "L": 19}, "by_season": {"2018": {"apps": 7, "starts": 0, "subs": 7, "g": 0, "a": 1, "W": 2, "D": 2, "L": 3}, "2019": {"apps": 16, "starts": 9, "subs": 7, "g": 1, "a": 1, "W": 2, "D": 6, "L": 8}, "2020": {"apps": 20, "starts": 16, "subs": 4, "g": 6, "a": 3, "W": 10, "D": 6, "L": 4}, "2021": {"apps": 23, "starts": 13, "subs": 10, "g": 0, "a": 4, "W": 9, "D": 10, "L": 4}}, "by_comp": {"League": {"apps": 66, "starts": 38, "subs": 28, "g": 7, "a": 9, "W": 23, "D": 24, "L": 19}}, "as_starter": {"W": 14, "D": 16, "L": 8}, "as_sub": {"W": 9, "D": 8, "L": 11}}, {"pc": "P047", "nick": "เตอร์", "name": "วีระเทพ ป้อมพันธ์", "pos": "MF", "seasons": [2016, 2017, 2018], "total": {"apps": 64, "starts": 59, "subs": 5, "g": 3, "a": 13, "W": 29, "D": 16, "L": 19}, "by_season": {"2016": {"apps": 16, "starts": 15, "subs": 1, "g": 1, "a": 4, "W": 8, "D": 5, "L": 3}, "2017": {"apps": 24, "starts": 21, "subs": 3, "g": 1, "a": 1, "W": 10, "D": 6, "L": 8}, "2018": {"apps": 24, "starts": 23, "subs": 1, "g": 1, "a": 8, "W": 11, "D": 5, "L": 8}}, "by_comp": {"League": {"apps": 64, "starts": 59, "subs": 5, "g": 3, "a": 13, "W": 29, "D": 16, "L": 19}}, "as_starter": {"W": 26, "D": 14, "L": 19}, "as_sub": {"W": 3, "D": 2, "L": 0}}, {"pc": "P132", "nick": "ไกด์", "name": "ธนนนท์ นุชประมูล", "pos": "DF", "seasons": [2022, 2023, 2024, 2025], "total": {"apps": 62, "starts": 48, "subs": 14, "g": 4, "a": 6, "W": 23, "D": 16, "L": 23}, "by_season": {"2022": {"apps": 9, "starts": 9, "subs": 0, "g": 1, "a": 1, "W": 5, "D": 3, "L": 1}, "2023": {"apps": 19, "starts": 16, "subs": 3, "g": 2, "a": 4, "W": 6, "D": 5, "L": 8}, "2024": {"apps": 16, "starts": 12, "subs": 4, "g": 0, "a": 0, "W": 5, "D": 4, "L": 7}, "2025": {"apps": 18, "starts": 11, "subs": 7, "g": 1, "a": 1, "W": 7, "D": 4, "L": 7}}, "by_comp": {"League": {"apps": 57, "starts": 44, "subs": 13, "g": 4, "a": 6, "W": 21, "D": 16, "L": 20}, "Cup": {"apps": 5, "starts": 4, "subs": 1, "g": 0, "a": 0, "W": 2, "D": 0, "L": 3}}, "as_starter": {"W": 16, "D": 13, "L": 19}, "as_sub": {"W": 7, "D": 3, "L": 4}}, {"pc": "P076", "nick": "จัมป์", "name": "นันทวุฒิ อ่อนลมูล", "pos": "MF", "seasons": [2018, 2019, 2020, 2021], "total": {"apps": 58, "starts": 45, "subs": 13, "g": 2, "a": 2, "W": 22, "D": 18, "L": 18}, "by_season": {"2018": {"apps": 8, "starts": 6, "subs": 2, "g": 0, "a": 0, "W": 2, "D": 2, "L": 4}, "2019": {"apps": 20, "starts": 18, "subs": 2, "g": 1, "a": 1, "W": 7, "D": 5, "L": 8}, "2020": {"apps": 17, "starts": 13, "subs": 4, "g": 1, "a": 1, "W": 8, "D": 5, "L": 4}, "2021": {"apps": 13, "starts": 8, "subs": 5, "g": 0, "a": 0, "W": 5, "D": 6, "L": 2}}, "by_comp": {"League": {"apps": 58, "starts": 45, "subs": 13, "g": 2, "a": 2, "W": 22, "D": 18, "L": 18}}, "as_starter": {"W": 16, "D": 13, "L": 16}, "as_sub": {"W": 6, "D": 5, "L": 2}}, {"pc": "P081", "nick": "มิล", "name": "ชามิล ศรีตองอ่อน", "pos": "MF", "seasons": [2019, 2020, 2021, 2022, 2023], "total": {"apps": 58, "starts": 38, "subs": 20, "g": 0, "a": 5, "W": 22, "D": 18, "L": 18}, "by_season": {"2019": {"apps": 5, "starts": 3, "subs": 2, "g": 0, "a": 0, "W": 0, "D": 1, "L": 4}, "2020": {"apps": 5, "starts": 2, "subs": 3, "g": 0, "a": 0, "W": 3, "D": 1, "L": 1}, "2021": {"apps": 11, "starts": 8, "subs": 3, "g": 0, "a": 1, "W": 6, "D": 4, "L": 1}, "2022": {"apps": 17, "starts": 15, "subs": 2, "g": 0, "a": 4, "W": 8, "D": 5, "L": 4}, "2023": {"apps": 20, "starts": 10, "subs": 10, "g": 0, "a": 0, "W": 5, "D": 7, "L": 8}}, "by_comp": {"League": {"apps": 57, "starts": 37, "subs": 20, "g": 0, "a": 5, "W": 22, "D": 18, "L": 17}, "Cup": {"apps": 1, "starts": 1, "subs": 0, "g": 0, "a": 0, "W": 0, "D": 0, "L": 1}}, "as_starter": {"W": 15, "D": 12, "L": 11}, "as_sub": {"W": 7, "D": 6, "L": 7}}, {"pc": "P104", "nick": "ฟลุค", "name": "วราวุฒิ สวัสดิ์", "pos": "MF", "seasons": [2021, 2022, 2023, 2024, 2025], "total": {"apps": 58, "starts": 40, "subs": 18, "g": 8, "a": 8, "W": 20, "D": 18, "L": 20}, "by_season": {"2021": {"apps": 14, "starts": 9, "subs": 5, "g": 1, "a": 2, "W": 5, "D": 7, "L": 2}, "2022": {"apps": 8, "starts": 5, "subs": 3, "g": 1, "a": 0, "W": 3, "D": 3, "L": 2}, "2023": {"apps": 4, "starts": 3, "subs": 1, "g": 0, "a": 1, "W": 2, "D": 1, "L": 1}, "2024": {"apps": 13, "starts": 5, "subs": 8, "g": 0, "a": 2, "W": 3, "D": 3, "L": 7}, "2025": {"apps": 19, "starts": 18, "subs": 1, "g": 6, "a": 3, "W": 7, "D": 4, "L": 8}}, "by_comp": {"League": {"apps": 52, "starts": 36, "subs": 16, "g": 8, "a": 8, "W": 19, "D": 17, "L": 16}, "Cup": {"apps": 6, "starts": 4, "subs": 2, "g": 0, "a": 0, "W": 1, "D": 1, "L": 4}}, "as_starter": {"W": 13, "D": 12, "L": 15}, "as_sub": {"W": 7, "D": 6, "L": 5}}, {"pc": "P141", "nick": "เดฟ", "name": "กฤติน ดำสำราญ", "pos": "DF", "seasons": [2023, 2024, 2025], "total": {"apps": 57, "starts": 53, "subs": 4, "g": 1, "a": 7, "W": 18, "D": 13, "L": 26}, "by_season": {"2023": {"apps": 20, "starts": 20, "subs": 0, "g": 1, "a": 3, "W": 4, "D": 5, "L": 11}, "2024": {"apps": 18, "starts": 16, "subs": 2, "g": 0, "a": 1, "W": 6, "D": 4, "L": 8}, "2025": {"apps": 19, "starts": 17, "subs": 2, "g": 0, "a": 3, "W": 8, "D": 4, "L": 7}}, "by_comp": {"League": {"apps": 52, "starts": 49, "subs": 3, "g": 1, "a": 6, "W": 17, "D": 12, "L": 23}, "Cup": {"apps": 5, "starts": 4, "subs": 1, "g": 0, "a": 1, "W": 1, "D": 1, "L": 3}}, "as_starter": {"W": 16, "D": 13, "L": 24}, "as_sub": {"W": 2, "D": 0, "L": 2}}, {"pc": "P128", "nick": "บู", "name": "ณัฐวุฒิ สุขสำราญ", "pos": "MF", "seasons": [2022, 2023, 2024, 2025], "total": {"apps": 56, "starts": 32, "subs": 24, "g": 9, "a": 5, "W": 17, "D": 16, "L": 23}, "by_season": {"2022": {"apps": 12, "starts": 6, "subs": 6, "g": 0, "a": 0, "W": 3, "D": 4, "L": 5}, "2023": {"apps": 13, "starts": 8, "subs": 5, "g": 3, "a": 0, "W": 3, "D": 5, "L": 5}, "2024": {"apps": 22, "starts": 18, "subs": 4, "g": 5, "a": 5, "W": 7, "D": 5, "L": 10}, "2025": {"apps": 9, "starts": 0, "subs": 9, "g": 1, "a": 0, "W": 4, "D": 2, "L": 3}}, "by_comp": {"League": {"apps": 48, "starts": 29, "subs": 19, "g": 8, "a": 5, "W": 15, "D": 15, "L": 18}, "Cup": {"apps": 8, "starts": 3, "subs": 5, "g": 1, "a": 0, "W": 2, "D": 1, "L": 5}}, "as_starter": {"W": 10, "D": 10, "L": 12}, "as_sub": {"W": 7, "D": 6, "L": 11}}, {"pc": "P127", "nick": "อั๊น", "name": "ก้องภพ วรรณภักดิ์", "pos": "MF", "seasons": [2022, 2023, 2024, 2025], "total": {"apps": 52, "starts": 36, "subs": 16, "g": 2, "a": 3, "W": 17, "D": 13, "L": 22}, "by_season": {"2022": {"apps": 7, "starts": 5, "subs": 2, "g": 1, "a": 1, "W": 3, "D": 2, "L": 2}, "2023": {"apps": 9, "starts": 6, "subs": 3, "g": 0, "a": 0, "W": 2, "D": 3, "L": 4}, "2024": {"apps": 18, "starts": 12, "subs": 6, "g": 0, "a": 1, "W": 5, "D": 4, "L": 9}, "2025": {"apps": 18, "starts": 13, "subs": 5, "g": 1, "a": 1, "W": 7, "D": 4, "L": 7}}, "by_comp": {"League": {"apps": 44, "starts": 32, "subs": 12, "g": 2, "a": 2, "W": 16, "D": 12, "L": 16}, "Cup": {"apps": 8, "starts": 4, "subs": 4, "g": 0, "a": 1, "W": 1, "D": 1, "L": 6}}, "as_starter": {"W": 15, "D": 8, "L": 13}, "as_sub": {"W": 2, "D": 5, "L": 9}}, {"pc": "P007", "nick": "นุก", "name": "จักพัน ไพรสุวรรณ", "pos": "DF", "seasons": [2015, 2016], "total": {"apps": 50, "starts": 50, "subs": 0, "g": 5, "a": 20, "W": 27, "D": 7, "L": 16}, "by_season": {"2015": {"apps": 33, "starts": 33, "subs": 0, "g": 2, "a": 10, "W": 16, "D": 3, "L": 14}, "2016": {"apps": 17, "starts": 17, "subs": 0, "g": 3, "a": 10, "W": 11, "D": 4, "L": 2}}, "by_comp": {"League": {"apps": 50, "starts": 50, "subs": 0, "g": 5, "a": 20, "W": 27, "D": 7, "L": 16}}, "as_starter": {"W": 27, "D": 7, "L": 16}, "as_sub": {"W": 0, "D": 0, "L": 0}}, {"pc": "P064", "nick": "ไดกิ", "name": "ไดกิ ฮิกูชิ", "pos": "DF", "seasons": [2017, 2018], "total": {"apps": 49, "starts": 48, "subs": 1, "g": 3, "a": 7, "W": 22, "D": 10, "L": 17}, "by_season": {"2017": {"apps": 26, "starts": 26, "subs": 0, "g": 2, "a": 6, "W": 12, "D": 5, "L": 9}, "2018": {"apps": 23, "starts": 22, "subs": 1, "g": 1, "a": 1, "W": 10, "D": 5, "L": 8}}, "by_comp": {"League": {"apps": 49, "starts": 48, "subs": 1, "g": 3, "a": 7, "W": 22, "D": 10, "L": 17}}, "as_starter": {"W": 22, "D": 9, "L": 17}, "as_sub": {"W": 0, "D": 1, "L": 0}}, {"pc": "P043", "nick": "อ๊อฟ", "name": "วุฒินันท์ แสนสุภา", "pos": "DF", "seasons": [2016, 2017, 2018], "total": {"apps": 47, "starts": 43, "subs": 4, "g": 2, "a": 2, "W": 23, "D": 12, "L": 12}, "by_season": {"2016": {"apps": 15, "starts": 15, "subs": 0, "g": 1, "a": 0, "W": 11, "D": 3, "L": 1}, "2017": {"apps": 18, "starts": 16, "subs": 2, "g": 1, "a": 1, "W": 6, "D": 5, "L": 7}, "2018": {"apps": 14, "starts": 12, "subs": 2, "g": 0, "a": 1, "W": 6, "D": 4, "L": 4}}, "by_comp": {"League": {"apps": 47, "starts": 43, "subs": 4, "g": 2, "a": 2, "W": 23, "D": 12, "L": 12}}, "as_starter": {"W": 20, "D": 12, "L": 11}, "as_sub": {"W": 3, "D": 0, "L": 1}}, {"pc": "P119", "nick": "โน่", "name": "ภรภัทร สิงห์พันธ์", "pos": "DF", "seasons": [2021, 2022, 2023, 2024, 2025], "total": {"apps": 47, "starts": 43, "subs": 4, "g": 0, "a": 0, "W": 14, "D": 12, "L": 21}, "by_season": {"2021": {"apps": 1, "starts": 0, "subs": 1, "g": 0, "a": 0, "W": 1, "D": 0, "L": 0}, "2022": {"apps": 4, "starts": 2, "subs": 2, "g": 0, "a": 0, "W": 1, "D": 2, "L": 1}, "2023": {"apps": 22, "starts": 22, "subs": 0, "g": 0, "a": 0, "W": 5, "D": 6, "L": 11}, "2024": {"apps": 11, "starts": 11, "subs": 0, "g": 0, "a": 0, "W": 4, "D": 2, "L": 5}, "2025": {"apps": 9, "starts": 8, "subs": 1, "g": 0, "a": 0, "W": 3, "D": 2, "L": 4}}, "by_comp": {"League": {"apps": 45, "starts": 41, "subs": 4, "g": 0, "a": 0, "W": 14, "D": 12, "L": 19}, "Cup": {"apps": 2, "starts": 2, "subs": 0, "g": 0, "a": 0, "W": 0, "D": 0, "L": 2}}, "as_starter": {"W": 11, "D": 12, "L": 20}, "as_sub": {"W": 3, "D": 0, "L": 1}}, {"pc": "P108", "nick": "ฟอร์ด", "name": "ศักดิ์พล นิชกรรม", "pos": "GK", "seasons": [2021, 2022, 2023, 2024], "total": {"apps": 46, "starts": 46, "subs": 0, "g": 0, "a": 1, "W": 16, "D": 16, "L": 14}, "by_season": {"2021": {"apps": 13, "starts": 13, "subs": 0, "g": 0, "a": 1, "W": 5, "D": 5, "L": 3}, "2022": {"apps": 13, "starts": 13, "subs": 0, "g": 0, "a": 0, "W": 5, "D": 5, "L": 3}, "2023": {"apps": 13, "starts": 13, "subs": 0, "g": 0, "a": 0, "W": 4, "D": 4, "L": 5}, "2024": {"apps": 7, "starts": 7, "subs": 0, "g": 0, "a": 0, "W": 2, "D": 2, "L": 3}}, "by_comp": {"League": {"apps": 45, "starts": 45, "subs": 0, "g": 0, "a": 1, "W": 16, "D": 16, "L": 13}, "Cup": {"apps": 1, "starts": 1, "subs": 0, "g": 0, "a": 0, "W": 0, "D": 0, "L": 1}}, "as_starter": {"W": 16, "D": 16, "L": 14}, "as_sub": {"W": 0, "D": 0, "L": 0}}, {"pc": "P142", "nick": "จีโอ", "name": "ปัณณธร รางชางกูร", "pos": "FC", "seasons": [2023, 2024, 2025], "total": {"apps": 46, "starts": 33, "subs": 13, "g": 8, "a": 4, "W": 16, "D": 10, "L": 20}, "by_season": {"2023": {"apps": 5, "starts": 3, "subs": 2, "g": 1, "a": 0, "W": 1, "D": 1, "L": 3}, "2024": {"apps": 18, "starts": 9, "subs": 9, "g": 1, "a": 1, "W": 6, "D": 4, "L": 8}, "2025": {"apps": 23, "starts": 21, "subs": 2, "g": 6, "a": 3, "W": 9, "D": 5, "L": 9}}, "by_comp": {"League": {"apps": 41, "starts": 31, "subs": 10, "g": 6, "a": 4, "W": 15, "D": 9, "L": 17}, "Cup": {"apps": 5, "starts": 2, "subs": 3, "g": 2, "a": 0, "W": 1, "D": 1, "L": 3}}, "as_starter": {"W": 11, "D": 10, "L": 12}, "as_sub": {"W": 5, "D": 0, "L": 8}}, {"pc": "P014", "nick": "ยิ้ม", "name": "ฤทธิพร หวานชื่น", "pos": "FC", "seasons": [2015, 2016], "total": {"apps": 42, "starts": 20, "subs": 22, "g": 11, "a": 2, "W": 24, "D": 10, "L": 8}, "by_season": {"2015": {"apps": 23, "starts": 12, "subs": 11, "g": 6, "a": 1, "W": 13, "D": 5, "L": 5}, "2016": {"apps": 19, "starts": 8, "subs": 11, "g": 5, "a": 1, "W": 11, "D": 5, "L": 3}}, "by_comp": {"League": {"apps": 42, "starts": 20, "subs": 22, "g": 11, "a": 2, "W": 24, "D": 10, "L": 8}}, "as_starter": {"W": 12, "D": 4, "L": 4}, "as_sub": {"W": 12, "D": 6, "L": 4}}, {"pc": "P001", "nick": "ต่าย", "name": "อิสรภาพ บุญทิน", "pos": "GK", "seasons": [2015, 2016, 2017, 2018], "total": {"apps": 41, "starts": 41, "subs": 0, "g": 0, "a": 0, "W": 18, "D": 10, "L": 13}, "by_season": {"2015": {"apps": 5, "starts": 5, "subs": 0, "g": 0, "a": 0, "W": 1, "D": 0, "L": 4}, "2016": {"apps": 10, "starts": 10, "subs": 0, "g": 0, "a": 0, "W": 7, "D": 2, "L": 1}, "2017": {"apps": 13, "starts": 13, "subs": 0, "g": 0, "a": 0, "W": 6, "D": 3, "L": 4}, "2018": {"apps": 13, "starts": 13, "subs": 0, "g": 0, "a": 0, "W": 4, "D": 5, "L": 4}}, "by_comp": {"League": {"apps": 41, "starts": 41, "subs": 0, "g": 0, "a": 0, "W": 18, "D": 10, "L": 13}}, "as_starter": {"W": 18, "D": 10, "L": 13}, "as_sub": {"W": 0, "D": 0, "L": 0}}, {"pc": "P060", "nick": "อั้ม", "name": "เพชรรัตน์ โชติปาละ", "pos": "DF", "seasons": [2017, 2018], "total": {"apps": 41, "starts": 38, "subs": 3, "g": 1, "a": 4, "W": 17, "D": 9, "L": 15}, "by_season": {"2017": {"apps": 17, "starts": 14, "subs": 3, "g": 0, "a": 2, "W": 7, "D": 4, "L": 6}, "2018": {"apps": 24, "starts": 24, "subs": 0, "g": 1, "a": 2, "W": 10, "D": 5, "L": 9}}, "by_comp": {"League": {"apps": 41, "starts": 38, "subs": 3, "g": 1, "a": 4, "W": 17, "D": 9, "L": 15}}, "as_starter": {"W": 16, "D": 8, "L": 14}, "as_sub": {"W": 1, "D": 1, "L": 1}}, {"pc": "P107", "nick": "คิม", "name": "ศุภกร ลัพเสถียร", "pos": "FC", "seasons": [2021, 2022, 2023, 2024, 2025], "total": {"apps": 38, "starts": 17, "subs": 21, "g": 6, "a": 2, "W": 11, "D": 5, "L": 22}, "by_season": {"2021": {"apps": 4, "starts": 1, "subs": 3, "g": 1, "a": 1, "W": 4, "D": 0, "L": 0}, "2022": {"apps": 6, "starts": 5, "subs": 1, "g": 1, "a": 0, "W": 1, "D": 1, "L": 4}, "2023": {"apps": 16, "starts": 5, "subs": 11, "g": 4, "a": 0, "W": 4, "D": 3, "L": 9}, "2024": {"apps": 4, "starts": 2, "subs": 2, "g": 0, "a": 0, "W": 0, "D": 0, "L": 4}, "2025": {"apps": 8, "starts": 4, "subs": 4, "g": 0, "a": 1, "W": 2, "D": 1, "L": 5}}, "by_comp": {"League": {"apps": 32, "starts": 14, "subs": 18, "g": 6, "a": 1, "W": 10, "D": 5, "L": 17}, "Cup": {"apps": 6, "starts": 3, "subs": 3, "g": 0, "a": 1, "W": 1, "D": 0, "L": 5}}, "as_starter": {"W": 6, "D": 1, "L": 10}, "as_sub": {"W": 5, "D": 4, "L": 12}}, {"pc": "P133", "nick": "เทน", "name": "ภูบดี อ้อนชัยภูมิ", "pos": "MF", "seasons": [2023, 2024, 2025], "total": {"apps": 38, "starts": 17, "subs": 21, "g": 6, "a": 3, "W": 11, "D": 10, "L": 17}, "by_season": {"2023": {"apps": 12, "starts": 6, "subs": 6, "g": 0, "a": 0, "W": 3, "D": 3, "L": 6}, "2024": {"apps": 17, "starts": 10, "subs": 7, "g": 4, "a": 2, "W": 5, "D": 4, "L": 8}, "2025": {"apps": 9, "starts": 1, "subs": 8, "g": 2, "a": 1, "W": 3, "D": 3, "L": 3}}, "by_comp": {"League": {"apps": 34, "starts": 14, "subs": 20, "g": 6, "a": 2, "W": 10, "D": 10, "L": 14}, "Cup": {"apps": 4, "starts": 3, "subs": 1, "g": 0, "a": 1, "W": 1, "D": 0, "L": 3}}, "as_starter": {"W": 5, "D": 6, "L": 6}, "as_sub": {"W": 6, "D": 4, "L": 11}}, {"pc": "P003", "nick": "ทุเรียน", "name": "ฐานรงค์ ทุเรียน", "pos": "DF", "seasons": [2015, 2017], "total": {"apps": 36, "starts": 35, "subs": 1, "g": 4, "a": 0, "W": 17, "D": 5, "L": 14}, "by_season": {"2015": {"apps": 27, "starts": 27, "subs": 0, "g": 4, "a": 0, "W": 14, "D": 4, "L": 9}, "2017": {"apps": 9, "starts": 8, "subs": 1, "g": 0, "a": 0, "W": 3, "D": 1, "L": 5}}, "by_comp": {"League": {"apps": 36, "starts": 35, "subs": 1, "g": 4, "a": 0, "W": 17, "D": 5, "L": 14}}, "as_starter": {"W": 17, "D": 5, "L": 13}, "as_sub": {"W": 0, "D": 0, "L": 1}}, {"pc": "P023", "nick": "แมค", "name": "สรวิศ สุขบันเทิง", "pos": "MF", "seasons": [2015, 2017, 2018, 2019, 2020], "total": {"apps": 36, "starts": 30, "subs": 6, "g": 7, "a": 9, "W": 10, "D": 10, "L": 16}, "by_season": {"2015": {"apps": 1, "starts": 0, "subs": 1, "g": 0, "a": 0, "W": 0, "D": 0, "L": 1}, "2017": {"apps": 2, "starts": 1, "subs": 1, "g": 0, "a": 0, "W": 0, "D": 1, "L": 1}, "2018": {"apps": 4, "starts": 3, "subs": 1, "g": 0, "a": 0, "W": 2, "D": 1, "L": 1}, "2019": {"apps": 23, "starts": 22, "subs": 1, "g": 5, "a": 9, "W": 5, "D": 7, "L": 11}, "2020": {"apps": 6, "starts": 4, "subs": 2, "g": 2, "a": 0, "W": 3, "D": 1, "L": 2}}, "by_comp": {"League": {"apps": 36, "starts": 30, "subs": 6, "g": 7, "a": 9, "W": 10, "D": 10, "L": 16}}, "as_starter": {"W": 8, "D": 9, "L": 13}, "as_sub": {"W": 2, "D": 1, "L": 3}}, {"pc": "P027", "nick": "คิมิ", "name": "คิมิอากิ คิโนมูระ", "pos": "DF", "seasons": [2015, 2016], "total": {"apps": 36, "starts": 34, "subs": 2, "g": 4, "a": 1, "W": 18, "D": 6, "L": 12}, "by_season": {"2015": {"apps": 30, "starts": 28, "subs": 2, "g": 3, "a": 1, "W": 15, "D": 3, "L": 12}, "2016": {"apps": 6, "starts": 6, "subs": 0, "g": 1, "a": 0, "W": 3, "D": 3, "L": 0}}, "by_comp": {"League": {"apps": 36, "starts": 34, "subs": 2, "g": 4, "a": 1, "W": 18, "D": 6, "L": 12}}, "as_starter": {"W": 16, "D": 6, "L": 12}, "as_sub": {"W": 2, "D": 0, "L": 0}}, {"pc": "P114", "nick": "เกรียง", "name": "กันตินันท์ จันมูลตรี", "pos": "MF", "seasons": [2021, 2022, 2023, 2024], "total": {"apps": 36, "starts": 20, "subs": 16, "g": 2, "a": 2, "W": 10, "D": 9, "L": 17}, "by_season": {"2021": {"apps": 9, "starts": 6, "subs": 3, "g": 1, "a": 2, "W": 5, "D": 2, "L": 2}, "2022": {"apps": 12, "starts": 7, "subs": 5, "g": 1, "a": 0, "W": 4, "D": 3, "L": 5}, "2023": {"apps": 7, "starts": 3, "subs": 4, "g": 0, "a": 0, "W": 1, "D": 2, "L": 4}, "2024": {"apps": 8, "starts": 4, "subs": 4, "g": 0, "a": 0, "W": 0, "D": 2, "L": 6}}, "by_comp": {"League": {"apps": 34, "starts": 18, "subs": 16, "g": 2, "a": 2, "W": 10, "D": 9, "L": 15}, "Cup": {"apps": 2, "starts": 2, "subs": 0, "g": 0, "a": 0, "W": 0, "D": 0, "L": 2}}, "as_starter": {"W": 8, "D": 3, "L": 9}, "as_sub": {"W": 2, "D": 6, "L": 8}}, {"pc": "P036", "nick": "เล็ก", "name": "วงพันธ์ ฉิมพงษ์", "pos": "MF", "seasons": [2015, 2016], "total": {"apps": 35, "starts": 32, "subs": 3, "g": 1, "a": 0, "W": 16, "D": 8, "L": 11}, "by_season": {"2015": {"apps": 21, "starts": 20, "subs": 1, "g": 0, "a": 0, "W": 8, "D": 3, "L": 10}, "2016": {"apps": 14, "starts": 12, "subs": 2, "g": 1, "a": 0, "W": 8, "D": 5, "L": 1}}, "by_comp": {"League": {"apps": 35, "starts": 32, "subs": 3, "g": 1, "a": 0, "W": 16, "D": 8, "L": 11}}, "as_starter": {"W": 15, "D": 7, "L": 10}, "as_sub": {"W": 1, "D": 1, "L": 1}}, {"pc": "P048", "nick": "โซล่า", "name": "ภานุเทพ คีรีแลง", "pos": "FC", "seasons": [2016, 2017, 2019, 2020], "total": {"apps": 35, "starts": 6, "subs": 29, "g": 3, "a": 5, "W": 14, "D": 9, "L": 12}, "by_season": {"2016": {"apps": 3, "starts": 0, "subs": 3, "g": 0, "a": 0, "W": 1, "D": 1, "L": 1}, "2017": {"apps": 7, "starts": 0, "subs": 7, "g": 0, "a": 1, "W": 3, "D": 0, "L": 4}, "2019": {"apps": 9, "starts": 2, "subs": 7, "g": 0, "a": 0, "W": 2, "D": 2, "L": 5}, "2020": {"apps": 16, "starts": 4, "subs": 12, "g": 3, "a": 4, "W": 8, "D": 6, "L": 2}}, "by_comp": {"League": {"apps": 35, "starts": 6, "subs": 29, "g": 3, "a": 5, "W": 14, "D": 9, "L": 12}}, "as_starter": {"W": 2, "D": 2, "L": 2}, "as_sub": {"W": 12, "D": 7, "L": 10}}, {"pc": "P095", "nick": "ปอง", "name": "สมปอง สอเหลบ", "pos": "FC", "seasons": [2020, 2022], "total": {"apps": 35, "starts": 25, "subs": 10, "g": 6, "a": 11, "W": 14, "D": 12, "L": 9}, "by_season": {"2020": {"apps": 18, "starts": 17, "subs": 1, "g": 5, "a": 10, "W": 9, "D": 6, "L": 3}, "2022": {"apps": 17, "starts": 8, "subs": 9, "g": 1, "a": 1, "W": 5, "D": 6, "L": 6}}, "by_comp": {"League": {"apps": 35, "starts": 25, "subs": 10, "g": 6, "a": 11, "W": 14, "D": 12, "L": 9}}, "as_starter": {"W": 9, "D": 10, "L": 6}, "as_sub": {"W": 5, "D": 2, "L": 3}}, {"pc": "P011", "nick": "มัต", "name": "ณัฐพงษ์ หมาดเด็น", "pos": "MF", "seasons": [2015, 2016, 2017], "total": {"apps": 32, "starts": 24, "subs": 8, "g": 0, "a": 0, "W": 16, "D": 4, "L": 12}, "by_season": {"2015": {"apps": 13, "starts": 10, "subs": 3, "g": 0, "a": 0, "W": 6, "D": 2, "L": 5}, "2016": {"apps": 5, "starts": 2, "subs": 3, "g": 0, "a": 0, "W": 5, "D": 0, "L": 0}, "2017": {"apps": 14, "starts": 12, "subs": 2, "g": 0, "a": 0, "W": 5, "D": 2, "L": 7}}, "by_comp": {"League": {"apps": 32, "starts": 24, "subs": 8, "g": 0, "a": 0, "W": 16, "D": 4, "L": 12}}, "as_starter": {"W": 10, "D": 4, "L": 10}, "as_sub": {"W": 6, "D": 0, "L": 2}}, {"pc": "P115", "nick": "บอย", "name": "สิทธิพร ฉิมนนท์", "pos": "DF", "seasons": [2021, 2022, 2023], "total": {"apps": 32, "starts": 20, "subs": 12, "g": 0, "a": 1, "W": 13, "D": 9, "L": 10}, "by_season": {"2021": {"apps": 9, "starts": 8, "subs": 1, "g": 0, "a": 0, "W": 7, "D": 0, "L": 2}, "2022": {"apps": 16, "starts": 10, "subs": 6, "g": 0, "a": 1, "W": 5, "D": 5, "L": 6}, "2023": {"apps": 7, "starts": 2, "subs": 5, "g": 0, "a": 0, "W": 1, "D": 4, "L": 2}}, "by_comp": {"League": {"apps": 31, "starts": 20, "subs": 11, "g": 0, "a": 1, "W": 13, "D": 9, "L": 9}, "Cup": {"apps": 1, "starts": 0, "subs": 1, "g": 0, "a": 0, "W": 0, "D": 0, "L": 1}}, "as_starter": {"W": 8, "D": 5, "L": 7}, "as_sub": {"W": 5, "D": 4, "L": 3}}, {"pc": "P116", "nick": "โคเอดิโอ", "name": "โมฮัมเหม็ด โคอาดิโอ", "pos": "FC", "seasons": [2021, 2022], "total": {"apps": 32, "starts": 30, "subs": 2, "g": 18, "a": 5, "W": 16, "D": 8, "L": 8}, "by_season": {"2021": {"apps": 9, "starts": 9, "subs": 0, "g": 7, "a": 1, "W": 6, "D": 1, "L": 2}, "2022": {"apps": 23, "starts": 21, "subs": 2, "g": 11, "a": 4, "W": 10, "D": 7, "L": 6}}, "by_comp": {"League": {"apps": 32, "starts": 30, "subs": 2, "g": 18, "a": 5, "W": 16, "D": 8, "L": 8}}, "as_starter": {"W": 16, "D": 7, "L": 7}, "as_sub": {"W": 0, "D": 1, "L": 1}}, {"pc": "P019", "nick": "ใหม่", "name": "ธรรมรัตน์ แว่นมณี", "pos": "MF", "seasons": [2015], "total": {"apps": 31, "starts": 23, "subs": 8, "g": 2, "a": 3, "W": 16, "D": 3, "L": 12}, "by_season": {"2015": {"apps": 31, "starts": 23, "subs": 8, "g": 2, "a": 3, "W": 16, "D": 3, "L": 12}}, "by_comp": {"League": {"apps": 31, "starts": 23, "subs": 8, "g": 2, "a": 3, "W": 16, "D": 3, "L": 12}}, "as_starter": {"W": 9, "D": 3, "L": 11}, "as_sub": {"W": 7, "D": 0, "L": 1}}, {"pc": "P042", "nick": "เจ็ก", "name": "นิรุจน์ ยาปัน", "pos": "DF", "seasons": [2016, 2017, 2018, 2019, 2020], "total": {"apps": 30, "starts": 25, "subs": 5, "g": 0, "a": 1, "W": 11, "D": 4, "L": 15}, "by_season": {"2016": {"apps": 3, "starts": 1, "subs": 2, "g": 0, "a": 0, "W": 2, "D": 0, "L": 1}, "2017": {"apps": 7, "starts": 7, "subs": 0, "g": 0, "a": 1, "W": 3, "D": 0, "L": 4}, "2018": {"apps": 3, "starts": 3, "subs": 0, "g": 0, "a": 0, "W": 2, "D": 0, "L": 1}, "2019": {"apps": 16, "starts": 14, "subs": 2, "g": 0, "a": 0, "W": 3, "D": 4, "L": 9}, "2020": {"apps": 1, "starts": 0, "subs": 1, "g": 0, "a": 0, "W": 1, "D": 0, "L": 0}}, "by_comp": {"League": {"apps": 30, "starts": 25, "subs": 5, "g": 0, "a": 1, "W": 11, "D": 4, "L": 15}}, "as_starter": {"W": 6, "D": 4, "L": 15}, "as_sub": {"W": 5, "D": 0, "L": 0}}, {"pc": "P025", "nick": "นัท", "name": "ณัฐพงษ์ สายริยา", "pos": "DF", "seasons": [2015], "total": {"apps": 29, "starts": 26, "subs": 3, "g": 0, "a": 0, "W": 13, "D": 3, "L": 13}, "by_season": {"2015": {"apps": 29, "starts": 26, "subs": 3, "g": 0, "a": 0, "W": 13, "D": 3, "L": 13}}, "by_comp": {"League": {"apps": 29, "starts": 26, "subs": 3, "g": 0, "a": 0, "W": 13, "D": 3, "L": 13}}, "as_starter": {"W": 10, "D": 3, "L": 13}, "as_sub": {"W": 3, "D": 0, "L": 0}}, {"pc": "P033", "nick": "เจ", "name": "ศราวุฒิ อินพวง", "pos": "DF", "seasons": [2015, 2016, 2017], "total": {"apps": 29, "starts": 27, "subs": 2, "g": 5, "a": 3, "W": 16, "D": 5, "L": 8}, "by_season": {"2015": {"apps": 22, "starts": 20, "subs": 2, "g": 4, "a": 2, "W": 12, "D": 2, "L": 8}, "2016": {"apps": 2, "starts": 2, "subs": 0, "g": 0, "a": 0, "W": 2, "D": 0, "L": 0}, "2017": {"apps": 5, "starts": 5, "subs": 0, "g": 1, "a": 1, "W": 2, "D": 3, "L": 0}}, "by_comp": {"League": {"apps": 29, "starts": 27, "subs": 2, "g": 5, "a": 3, "W": 16, "D": 5, "L": 8}}, "as_starter": {"W": 16, "D": 4, "L": 7}, "as_sub": {"W": 0, "D": 1, "L": 1}}, {"pc": "P010", "nick": "บูม", "name": "ธรรมชาติ นาคะพันธ์", "pos": "MF", "seasons": [2015], "total": {"apps": 28, "starts": 24, "subs": 4, "g": 2, "a": 11, "W": 15, "D": 3, "L": 10}, "by_season": {"2015": {"apps": 28, "starts": 24, "subs": 4, "g": 2, "a": 11, "W": 15, "D": 3, "L": 10}}, "by_comp": {"League": {"apps": 28, "starts": 24, "subs": 4, "g": 2, "a": 11, "W": 15, "D": 3, "L": 10}}, "as_starter": {"W": 12, "D": 2, "L": 10}, "as_sub": {"W": 3, "D": 1, "L": 0}}, {"pc": "P028", "nick": "ยู", "name": "ยู คูโบกิ", "pos": "FC", "seasons": [2015], "total": {"apps": 28, "starts": 18, "subs": 10, "g": 19, "a": 1, "W": 13, "D": 4, "L": 11}, "by_season": {"2015": {"apps": 28, "starts": 18, "subs": 10, "g": 19, "a": 1, "W": 13, "D": 4, "L": 11}}, "by_comp": {"League": {"apps": 28, "starts": 18, "subs": 10, "g": 19, "a": 1, "W": 13, "D": 4, "L": 11}}, "as_starter": {"W": 7, "D": 4, "L": 7}, "as_sub": {"W": 6, "D": 0, "L": 4}}, {"pc": "P131", "nick": "อิคลาส", "name": "อิคลาส สันหรน", "pos": "FC", "seasons": [2022, 2023], "total": {"apps": 27, "starts": 14, "subs": 13, "g": 4, "a": 4, "W": 8, "D": 8, "L": 11}, "by_season": {"2022": {"apps": 7, "starts": 1, "subs": 6, "g": 0, "a": 0, "W": 3, "D": 3, "L": 1}, "2023": {"apps": 20, "starts": 13, "subs": 7, "g": 4, "a": 4, "W": 5, "D": 5, "L": 10}}, "by_comp": {"League": {"apps": 26, "starts": 14, "subs": 12, "g": 4, "a": 4, "W": 8, "D": 8, "L": 10}, "Cup": {"apps": 1, "starts": 0, "subs": 1, "g": 0, "a": 0, "W": 0, "D": 0, "L": 1}}, "as_starter": {"W": 4, "D": 4, "L": 6}, "as_sub": {"W": 4, "D": 4, "L": 5}}, {"pc": "P139", "nick": "เฟิร์ส", "name": "วิญญูวิศว์ ทุมคำปัญจรัส", "pos": "MF", "seasons": [2023, 2024, 2025], "total": {"apps": 27, "starts": 18, "subs": 9, "g": 3, "a": 2, "W": 7, "D": 7, "L": 13}, "by_season": {"2023": {"apps": 8, "starts": 3, "subs": 5, "g": 0, "a": 0, "W": 0, "D": 3, "L": 5}, "2024": {"apps": 12, "starts": 10, "subs": 2, "g": 2, "a": 2, "W": 4, "D": 2, "L": 6}, "2025": {"apps": 7, "starts": 5, "subs": 2, "g": 1, "a": 0, "W": 3, "D": 2, "L": 2}}, "by_comp": {"League": {"apps": 23, "starts": 15, "subs": 8, "g": 3, "a": 2, "W": 6, "D": 7, "L": 10}, "Cup": {"apps": 4, "starts": 3, "subs": 1, "g": 0, "a": 0, "W": 1, "D": 0, "L": 3}}, "as_starter": {"W": 6, "D": 4, "L": 8}, "as_sub": {"W": 1, "D": 3, "L": 5}}, {"pc": "P125", "nick": "แอน", "name": "อิสมาอีล ยาประจัน", "pos": "MF", "seasons": [2022, 2023, 2024, 2025], "total": {"apps": 26, "starts": 20, "subs": 6, "g": 0, "a": 1, "W": 8, "D": 9, "L": 9}, "by_season": {"2022": {"apps": 1, "starts": 1, "subs": 0, "g": 0, "a": 0, "W": 1, "D": 0, "L": 0}, "2023": {"apps": 5, "starts": 2, "subs": 3, "g": 0, "a": 0, "W": 1, "D": 2, "L": 2}, "2024": {"apps": 9, "starts": 7, "subs": 2, "g": 0, "a": 0, "W": 2, "D": 4, "L": 3}, "2025": {"apps": 11, "starts": 10, "subs": 1, "g": 0, "a": 1, "W": 4, "D": 3, "L": 4}}, "by_comp": {"League": {"apps": 22, "starts": 16, "subs": 6, "g": 0, "a": 1, "W": 8, "D": 8, "L": 6}, "Cup": {"apps": 4, "starts": 4, "subs": 0, "g": 0, "a": 0, "W": 0, "D": 1, "L": 3}}, "as_starter": {"W": 5, "D": 7, "L": 8}, "as_sub": {"W": 3, "D": 2, "L": 1}}, {"pc": "P123", "nick": "Frank", "name": "LIONEL FRANK TOUKO NZOLA", "pos": "DF", "seasons": [2022], "total": {"apps": 25, "starts": 25, "subs": 0, "g": 4, "a": 1, "W": 10, "D": 7, "L": 8}, "by_season": {"2022": {"apps": 25, "starts": 25, "subs": 0, "g": 4, "a": 1, "W": 10, "D": 7, "L": 8}}, "by_comp": {"League": {"apps": 25, "starts": 25, "subs": 0, "g": 4, "a": 1, "W": 10, "D": 7, "L": 8}}, "as_starter": {"W": 10, "D": 7, "L": 8}, "as_sub": {"W": 0, "D": 0, "L": 0}}, {"pc": "P140", "nick": "ยาว", "name": "ธรรมรัฐ ภูมิสถาน", "pos": "DF", "seasons": [2023, 2024, 2025], "total": {"apps": 25, "starts": 20, "subs": 5, "g": 1, "a": 0, "W": 7, "D": 5, "L": 13}, "by_season": {"2023": {"apps": 5, "starts": 4, "subs": 1, "g": 0, "a": 0, "W": 1, "D": 2, "L": 2}, "2024": {"apps": 11, "starts": 11, "subs": 0, "g": 0, "a": 0, "W": 3, "D": 1, "L": 7}, "2025": {"apps": 9, "starts": 5, "subs": 4, "g": 1, "a": 0, "W": 3, "D": 2, "L": 4}}, "by_comp": {"League": {"apps": 21, "starts": 17, "subs": 4, "g": 1, "a": 0, "W": 6, "D": 5, "L": 10}, "Cup": {"apps": 4, "starts": 3, "subs": 1, "g": 0, "a": 0, "W": 1, "D": 0, "L": 3}}, "as_starter": {"W": 5, "D": 4, "L": 11}, "as_sub": {"W": 2, "D": 1, "L": 2}}, {"pc": "P100", "nick": "Bibi", "name": "Behnam Habibi", "pos": "DF", "seasons": [2021], "total": {"apps": 24, "starts": 23, "subs": 1, "g": 3, "a": 0, "W": 10, "D": 10, "L": 4}, "by_season": {"2021": {"apps": 24, "starts": 23, "subs": 1, "g": 3, "a": 0, "W": 10, "D": 10, "L": 4}}, "by_comp": {"League": {"apps": 24, "starts": 23, "subs": 1, "g": 3, "a": 0, "W": 10, "D": 10, "L": 4}}, "as_starter": {"W": 10, "D": 9, "L": 4}, "as_sub": {"W": 0, "D": 1, "L": 0}}, {"pc": "P105", "nick": "ไม้", "name": "ฉัตริน พาทีทิน", "pos": "DF", "seasons": [2021, 2022, 2023], "total": {"apps": 24, "starts": 17, "subs": 7, "g": 0, "a": 0, "W": 11, "D": 7, "L": 6}, "by_season": {"2021": {"apps": 7, "starts": 4, "subs": 3, "g": 0, "a": 0, "W": 6, "D": 1, "L": 0}, "2022": {"apps": 6, "starts": 5, "subs": 1, "g": 0, "a": 0, "W": 3, "D": 3, "L": 0}, "2023": {"apps": 11, "starts": 8, "subs": 3, "g": 0, "a": 0, "W": 2, "D": 3, "L": 6}}, "by_comp": {"League": {"apps": 23, "starts": 16, "subs": 7, "g": 0, "a": 0, "W": 11, "D": 7, "L": 5}, "Cup": {"apps": 1, "starts": 1, "subs": 0, "g": 0, "a": 0, "W": 0, "D": 0, "L": 1}}, "as_starter": {"W": 8, "D": 5, "L": 4}, "as_sub": {"W": 3, "D": 2, "L": 2}}, {"pc": "P065", "nick": "โช", "name": "โช ยวน วู", "pos": "FC", "seasons": [2017], "total": {"apps": 23, "starts": 18, "subs": 5, "g": 7, "a": 3, "W": 8, "D": 6, "L": 9}, "by_season": {"2017": {"apps": 23, "starts": 18, "subs": 5, "g": 7, "a": 3, "W": 8, "D": 6, "L": 9}}, "by_comp": {"League": {"apps": 23, "starts": 18, "subs": 5, "g": 7, "a": 3, "W": 8, "D": 6, "L": 9}}, "as_starter": {"W": 7, "D": 5, "L": 6}, "as_sub": {"W": 1, "D": 1, "L": 3}}, {"pc": "P082", "nick": "หมัย", "name": "อิสหมัย มามะ", "pos": "GK", "seasons": [2019, 2020, 2021, 2022], "total": {"apps": 23, "starts": 23, "subs": 0, "g": 0, "a": 0, "W": 12, "D": 4, "L": 7}, "by_season": {"2019": {"apps": 1, "starts": 1, "subs": 0, "g": 0, "a": 0, "W": 0, "D": 0, "L": 1}, "2020": {"apps": 6, "starts": 6, "subs": 0, "g": 0, "a": 0, "W": 4, "D": 1, "L": 1}, "2021": {"apps": 3, "starts": 3, "subs": 0, "g": 0, "a": 0, "W": 3, "D": 0, "L": 0}, "2022": {"apps": 13, "starts": 13, "subs": 0, "g": 0, "a": 0, "W": 5, "D": 3, "L": 5}}, "by_comp": {"League": {"apps": 23, "starts": 23, "subs": 0, "g": 0, "a": 0, "W": 12, "D": 4, "L": 7}}, "as_starter": {"W": 12, "D": 4, "L": 7}, "as_sub": {"W": 0, "D": 0, "L": 0}}, {"pc": "P056", "nick": "Messi", "name": "Bamba Messi", "pos": "FC", "seasons": [2016], "total": {"apps": 22, "starts": 17, "subs": 5, "g": 13, "a": 5, "W": 13, "D": 6, "L": 3}, "by_season": {"2016": {"apps": 22, "starts": 17, "subs": 5, "g": 13, "a": 5, "W": 13, "D": 6, "L": 3}}, "by_comp": {"League": {"apps": 22, "starts": 17, "subs": 5, "g": 13, "a": 5, "W": 13, "D": 6, "L": 3}}, "as_starter": {"W": 9, "D": 5, "L": 3}, "as_sub": {"W": 4, "D": 1, "L": 0}}, {"pc": "P148", "nick": "ไอซ์", "name": "คุณากร สุวรรณกุมาร", "pos": "DF", "seasons": [2024, 2025], "total": {"apps": 22, "starts": 17, "subs": 5, "g": 0, "a": 0, "W": 11, "D": 3, "L": 8}, "by_season": {"2024": {"apps": 10, "starts": 6, "subs": 4, "g": 0, "a": 0, "W": 5, "D": 1, "L": 4}, "2025": {"apps": 12, "starts": 11, "subs": 1, "g": 0, "a": 0, "W": 6, "D": 2, "L": 4}}, "by_comp": {"League": {"apps": 19, "starts": 15, "subs": 4, "g": 0, "a": 0, "W": 9, "D": 3, "L": 7}, "Cup": {"apps": 3, "starts": 2, "subs": 1, "g": 0, "a": 0, "W": 2, "D": 0, "L": 1}}, "as_starter": {"W": 9, "D": 3, "L": 5}, "as_sub": {"W": 2, "D": 0, "L": 3}}, {"pc": "P080", "nick": "อาร์ท", "name": "ศรัญญ์ ภักดี", "pos": "DF", "seasons": [2019, 2021, 2022], "total": {"apps": 21, "starts": 16, "subs": 5, "g": 0, "a": 0, "W": 6, "D": 9, "L": 6}, "by_season": {"2019": {"apps": 1, "starts": 0, "subs": 1, "g": 0, "a": 0, "W": 0, "D": 1, "L": 0}, "2021": {"apps": 1, "starts": 1, "subs": 0, "g": 0, "a": 0, "W": 0, "D": 1, "L": 0}, "2022": {"apps": 19, "starts": 15, "subs": 4, "g": 0, "a": 0, "W": 6, "D": 7, "L": 6}}, "by_comp": {"League": {"apps": 21, "starts": 16, "subs": 5, "g": 0, "a": 0, "W": 6, "D": 9, "L": 6}}, "as_starter": {"W": 5, "D": 7, "L": 4}, "as_sub": {"W": 1, "D": 2, "L": 2}}, {"pc": "P149", "nick": "เอิร์ธ", "name": "รัตนพงษ์ สินยานันท์", "pos": "GK", "seasons": [2024, 2025], "total": {"apps": 21, "starts": 21, "subs": 0, "g": 0, "a": 0, "W": 9, "D": 5, "L": 7}, "by_season": {"2024": {"apps": 4, "starts": 4, "subs": 0, "g": 0, "a": 0, "W": 2, "D": 1, "L": 1}, "2025": {"apps": 17, "starts": 17, "subs": 0, "g": 0, "a": 0, "W": 7, "D": 4, "L": 6}}, "by_comp": {"League": {"apps": 18, "starts": 18, "subs": 0, "g": 0, "a": 0, "W": 8, "D": 4, "L": 6}, "Cup": {"apps": 3, "starts": 3, "subs": 0, "g": 0, "a": 0, "W": 1, "D": 1, "L": 1}}, "as_starter": {"W": 9, "D": 5, "L": 7}, "as_sub": {"W": 0, "D": 0, "L": 0}}, {"pc": "P155", "nick": "คิว", "name": "สิรภพ นิลแสง", "pos": "DF", "seasons": [2025], "total": {"apps": 21, "starts": 21, "subs": 0, "g": 0, "a": 2, "W": 8, "D": 5, "L": 8}, "by_season": {"2025": {"apps": 21, "starts": 21, "subs": 0, "g": 0, "a": 2, "W": 8, "D": 5, "L": 8}}, "by_comp": {"League": {"apps": 18, "starts": 18, "subs": 0, "g": 0, "a": 2, "W": 8, "D": 4, "L": 6}, "Cup": {"apps": 3, "starts": 3, "subs": 0, "g": 0, "a": 0, "W": 0, "D": 1, "L": 2}}, "as_starter": {"W": 8, "D": 5, "L": 8}, "as_sub": {"W": 0, "D": 0, "L": 0}}, {"pc": "P018", "nick": "คิว", "name": "ณัฐพงษ์ ขจรมาลี", "pos": "GK", "seasons": [2015], "total": {"apps": 20, "starts": 20, "subs": 0, "g": 0, "a": 0, "W": 12, "D": 2, "L": 6}, "by_season": {"2015": {"apps": 20, "starts": 20, "subs": 0, "g": 0, "a": 0, "W": 12, "D": 2, "L": 6}}, "by_comp": {"League": {"apps": 20, "starts": 20, "subs": 0, "g": 0, "a": 0, "W": 12, "D": 2, "L": 6}}, "as_starter": {"W": 12, "D": 2, "L": 6}, "as_sub": {"W": 0, "D": 0, "L": 0}}, {"pc": "P074", "nick": "โดม", "name": "เกริกพล แก้วเหมือน", "pos": "MF", "seasons": [2018], "total": {"apps": 20, "starts": 13, "subs": 7, "g": 1, "a": 2, "W": 9, "D": 3, "L": 8}, "by_season": {"2018": {"apps": 20, "starts": 13, "subs": 7, "g": 1, "a": 2, "W": 9, "D": 3, "L": 8}}, "by_comp": {"League": {"apps": 20, "starts": 13, "subs": 7, "g": 1, "a": 2, "W": 9, "D": 3, "L": 8}}, "as_starter": {"W": 7, "D": 2, "L": 4}, "as_sub": {"W": 2, "D": 1, "L": 4}}, {"pc": "P154", "nick": "แชมป์", "name": "นที ตามประดับ", "pos": "MF", "seasons": [2025], "total": {"apps": 20, "starts": 19, "subs": 1, "g": 4, "a": 0, "W": 8, "D": 4, "L": 8}, "by_season": {"2025": {"apps": 20, "starts": 19, "subs": 1, "g": 4, "a": 0, "W": 8, "D": 4, "L": 8}}, "by_comp": {"League": {"apps": 18, "starts": 17, "subs": 1, "g": 4, "a": 0, "W": 8, "D": 3, "L": 7}, "Cup": {"apps": 2, "starts": 2, "subs": 0, "g": 0, "a": 0, "W": 0, "D": 1, "L": 1}}, "as_starter": {"W": 8, "D": 4, "L": 7}, "as_sub": {"W": 0, "D": 0, "L": 1}}, {"pc": "P006", "nick": "เน็ต", "name": "วรวรรธน์ บุษดี", "pos": "DF", "seasons": [2019, 2020], "total": {"apps": 19, "starts": 15, "subs": 4, "g": 0, "a": 1, "W": 8, "D": 5, "L": 6}, "by_season": {"2019": {"apps": 5, "starts": 4, "subs": 1, "g": 0, "a": 1, "W": 0, "D": 2, "L": 3}, "2020": {"apps": 14, "starts": 11, "subs": 3, "g": 0, "a": 0, "W": 8, "D": 3, "L": 3}}, "by_comp": {"League": {"apps": 19, "starts": 15, "subs": 4, "g": 0, "a": 1, "W": 8, "D": 5, "L": 6}}, "as_starter": {"W": 7, "D": 3, "L": 5}, "as_sub": {"W": 1, "D": 2, "L": 1}}, {"pc": "P051", "nick": "ไผ่", "name": "พงศธร ทองชะอุ่ม", "pos": "DF", "seasons": [2016], "total": {"apps": 19, "starts": 18, "subs": 1, "g": 1, "a": 4, "W": 11, "D": 6, "L": 2}, "by_season": {"2016": {"apps": 19, "starts": 18, "subs": 1, "g": 1, "a": 4, "W": 11, "D": 6, "L": 2}}, "by_comp": {"League": {"apps": 19, "starts": 18, "subs": 1, "g": 1, "a": 4, "W": 11, "D": 6, "L": 2}}, "as_starter": {"W": 11, "D": 5, "L": 2}, "as_sub": {"W": 0, "D": 1, "L": 0}}, {"pc": "P055", "nick": "บังดุลย์", "name": "อดุลย์ หมื่นสมาน", "pos": "DF", "seasons": [2016], "total": {"apps": 19, "starts": 19, "subs": 0, "g": 0, "a": 1, "W": 10, "D": 6, "L": 3}, "by_season": {"2016": {"apps": 19, "starts": 19, "subs": 0, "g": 0, "a": 1, "W": 10, "D": 6, "L": 3}}, "by_comp": {"League": {"apps": 19, "starts": 19, "subs": 0, "g": 0, "a": 1, "W": 10, "D": 6, "L": 3}}, "as_starter": {"W": 10, "D": 6, "L": 3}, "as_sub": {"W": 0, "D": 0, "L": 0}}, {"pc": "P093", "nick": "Jisung", "name": "Jisung", "pos": "MF", "seasons": [2020], "total": {"apps": 19, "starts": 17, "subs": 2, "g": 11, "a": 2, "W": 10, "D": 5, "L": 4}, "by_season": {"2020": {"apps": 19, "starts": 17, "subs": 2, "g": 11, "a": 2, "W": 10, "D": 5, "L": 4}}, "by_comp": {"League": {"apps": 19, "starts": 17, "subs": 2, "g": 11, "a": 2, "W": 10, "D": 5, "L": 4}}, "as_starter": {"W": 10, "D": 4, "L": 3}, "as_sub": {"W": 0, "D": 1, "L": 1}}, {"pc": "P110", "nick": "กาย", "name": "ณัฐวัฒน์ ชื่นเจริญสุข", "pos": "MF", "seasons": [2021, 2022, 2023, 2025], "total": {"apps": 19, "starts": 8, "subs": 11, "g": 0, "a": 1, "W": 6, "D": 4, "L": 9}, "by_season": {"2021": {"apps": 1, "starts": 0, "subs": 1, "g": 0, "a": 0, "W": 1, "D": 0, "L": 0}, "2022": {"apps": 4, "starts": 2, "subs": 2, "g": 0, "a": 0, "W": 1, "D": 1, "L": 2}, "2023": {"apps": 11, "starts": 5, "subs": 6, "g": 0, "a": 1, "W": 3, "D": 3, "L": 5}, "2025": {"apps": 3, "starts": 1, "subs": 2, "g": 0, "a": 0, "W": 1, "D": 0, "L": 2}}, "by_comp": {"League": {"apps": 19, "starts": 8, "subs": 11, "g": 0, "a": 1, "W": 6, "D": 4, "L": 9}}, "as_starter": {"W": 0, "D": 2, "L": 6}, "as_sub": {"W": 6, "D": 2, "L": 3}}, {"pc": "P026", "nick": "ท่อ", "name": "ณรัฐ มุนินทร์นพมาศ", "pos": "DF", "seasons": [2015], "total": {"apps": 18, "starts": 16, "subs": 2, "g": 1, "a": 0, "W": 12, "D": 3, "L": 3}, "by_season": {"2015": {"apps": 18, "starts": 16, "subs": 2, "g": 1, "a": 0, "W": 12, "D": 3, "L": 3}}, "by_comp": {"League": {"apps": 18, "starts": 16, "subs": 2, "g": 1, "a": 0, "W": 12, "D": 3, "L": 3}}, "as_starter": {"W": 11, "D": 2, "L": 3}, "as_sub": {"W": 1, "D": 1, "L": 0}}, {"pc": "P035", "nick": "ลี", "name": "Lee Seung Woo", "pos": "DF", "seasons": [2015, 2016], "total": {"apps": 18, "starts": 17, "subs": 1, "g": 1, "a": 0, "W": 6, "D": 2, "L": 10}, "by_season": {"2015": {"apps": 16, "starts": 16, "subs": 0, "g": 1, "a": 0, "W": 5, "D": 2, "L": 9}, "2016": {"apps": 2, "starts": 1, "subs": 1, "g": 0, "a": 0, "W": 1, "D": 0, "L": 1}}, "by_comp": {"League": {"apps": 18, "starts": 17, "subs": 1, "g": 1, "a": 0, "W": 6, "D": 2, "L": 10}}, "as_starter": {"W": 5, "D": 2, "L": 10}, "as_sub": {"W": 1, "D": 0, "L": 0}}, {"pc": "P134", "nick": "แชมป์", "name": "ณภัทร สื่อมโนธรรม", "pos": "GK", "seasons": [2024, 2025], "total": {"apps": 18, "starts": 16, "subs": 2, "g": 0, "a": 0, "W": 3, "D": 4, "L": 11}, "by_season": {"2024": {"apps": 13, "starts": 12, "subs": 1, "g": 0, "a": 0, "W": 3, "D": 3, "L": 7}, "2025": {"apps": 5, "starts": 4, "subs": 1, "g": 0, "a": 0, "W": 0, "D": 1, "L": 4}}, "by_comp": {"League": {"apps": 15, "starts": 13, "subs": 2, "g": 0, "a": 0, "W": 3, "D": 4, "L": 8}, "Cup": {"apps": 3, "starts": 3, "subs": 0, "g": 0, "a": 0, "W": 0, "D": 0, "L": 3}}, "as_starter": {"W": 3, "D": 3, "L": 10}, "as_sub": {"W": 0, "D": 1, "L": 1}}, {"pc": "P135", "nick": "บิ๊ก", "name": "ณรงค์เกียรติ สมโชค", "pos": "DF", "seasons": [2023, 2024, 2025], "total": {"apps": 18, "starts": 11, "subs": 7, "g": 1, "a": 1, "W": 5, "D": 4, "L": 9}, "by_season": {"2023": {"apps": 4, "starts": 3, "subs": 1, "g": 0, "a": 1, "W": 1, "D": 2, "L": 1}, "2024": {"apps": 10, "starts": 5, "subs": 5, "g": 1, "a": 0, "W": 3, "D": 2, "L": 5}, "2025": {"apps": 4, "starts": 3, "subs": 1, "g": 0, "a": 0, "W": 1, "D": 0, "L": 3}}, "by_comp": {"League": {"apps": 13, "starts": 8, "subs": 5, "g": 1, "a": 1, "W": 3, "D": 4, "L": 6}, "Cup": {"apps": 5, "starts": 3, "subs": 2, "g": 0, "a": 0, "W": 2, "D": 0, "L": 3}}, "as_starter": {"W": 2, "D": 3, "L": 6}, "as_sub": {"W": 3, "D": 1, "L": 3}}, {"pc": "P153", "nick": "อองรี", "name": "ธันย์ทัพพ์ กิตติเจริญวิวัฒน์", "pos": "DF", "seasons": [2024, 2025], "total": {"apps": 18, "starts": 10, "subs": 8, "g": 0, "a": 0, "W": 5, "D": 4, "L": 9}, "by_season": {"2024": {"apps": 1, "starts": 1, "subs": 0, "g": 0, "a": 0, "W": 0, "D": 0, "L": 1}, "2025": {"apps": 17, "starts": 9, "subs": 8, "g": 0, "a": 0, "W": 5, "D": 4, "L": 8}}, "by_comp": {"League": {"apps": 14, "starts": 7, "subs": 7, "g": 0, "a": 0, "W": 4, "D": 3, "L": 7}, "Cup": {"apps": 4, "starts": 3, "subs": 1, "g": 0, "a": 0, "W": 1, "D": 1, "L": 2}}, "as_starter": {"W": 1, "D": 2, "L": 7}, "as_sub": {"W": 4, "D": 2, "L": 2}}, {"pc": "P137", "nick": "พีท", "name": "จารุพัฒน์ กิตติวงศ์ธรรม", "pos": "DF", "seasons": [2023, 2024], "total": {"apps": 17, "starts": 9, "subs": 8, "g": 0, "a": 0, "W": 3, "D": 6, "L": 8}, "by_season": {"2023": {"apps": 11, "starts": 4, "subs": 7, "g": 0, "a": 0, "W": 1, "D": 4, "L": 6}, "2024": {"apps": 6, "starts": 5, "subs": 1, "g": 0, "a": 0, "W": 2, "D": 2, "L": 2}}, "by_comp": {"League": {"apps": 15, "starts": 8, "subs": 7, "g": 0, "a": 0, "W": 3, "D": 6, "L": 6}, "Cup": {"apps": 2, "starts": 1, "subs": 1, "g": 0, "a": 0, "W": 0, "D": 0, "L": 2}}, "as_starter": {"W": 3, "D": 2, "L": 4}, "as_sub": {"W": 0, "D": 4, "L": 4}}, {"pc": "P016", "nick": "เอก", "name": "เอกชัย ปรีชากุล", "pos": "MF", "seasons": [2015], "total": {"apps": 16, "starts": 12, "subs": 4, "g": 1, "a": 0, "W": 9, "D": 1, "L": 6}, "by_season": {"2015": {"apps": 16, "starts": 12, "subs": 4, "g": 1, "a": 0, "W": 9, "D": 1, "L": 6}}, "by_comp": {"League": {"apps": 16, "starts": 12, "subs": 4, "g": 1, "a": 0, "W": 9, "D": 1, "L": 6}}, "as_starter": {"W": 8, "D": 0, "L": 4}, "as_sub": {"W": 1, "D": 1, "L": 2}}, {"pc": "P067", "nick": "แบงค์", "name": "ชิษณุพงษ์ แพร่งพร้อม", "pos": "FC", "seasons": [2017], "total": {"apps": 16, "starts": 7, "subs": 9, "g": 3, "a": 0, "W": 8, "D": 4, "L": 4}, "by_season": {"2017": {"apps": 16, "starts": 7, "subs": 9, "g": 3, "a": 0, "W": 8, "D": 4, "L": 4}}, "by_comp": {"League": {"apps": 16, "starts": 7, "subs": 9, "g": 3, "a": 0, "W": 8, "D": 4, "L": 4}}, "as_starter": {"W": 3, "D": 1, "L": 3}, "as_sub": {"W": 5, "D": 3, "L": 1}}, {"pc": "P156", "nick": "บอส", "name": "คงณัฐ ท้วมทองดี", "pos": "FC", "seasons": [2025], "total": {"apps": 16, "starts": 4, "subs": 12, "g": 3, "a": 1, "W": 6, "D": 2, "L": 8}, "by_season": {"2025": {"apps": 16, "starts": 4, "subs": 12, "g": 3, "a": 1, "W": 6, "D": 2, "L": 8}}, "by_comp": {"League": {"apps": 12, "starts": 3, "subs": 9, "g": 3, "a": 1, "W": 5, "D": 1, "L": 6}, "Cup": {"apps": 4, "starts": 1, "subs": 3, "g": 0, "a": 0, "W": 1, "D": 1, "L": 2}}, "as_starter": {"W": 1, "D": 0, "L": 3}, "as_sub": {"W": 5, "D": 2, "L": 5}}, {"pc": "P050", "nick": "ยักษ์", "name": "นิรุตน์ คำสวัสดิ์", "pos": "FC", "seasons": [2016], "total": {"apps": 15, "starts": 7, "subs": 8, "g": 3, "a": 0, "W": 8, "D": 4, "L": 3}, "by_season": {"2016": {"apps": 15, "starts": 7, "subs": 8, "g": 3, "a": 0, "W": 8, "D": 4, "L": 3}}, "by_comp": {"League": {"apps": 15, "starts": 7, "subs": 8, "g": 3, "a": 0, "W": 8, "D": 4, "L": 3}}, "as_starter": {"W": 5, "D": 2, "L": 0}, "as_sub": {"W": 3, "D": 2, "L": 3}}, {"pc": "P097", "nick": "Pedro", "name": "Pedro", "pos": "DF", "seasons": [2020], "total": {"apps": 15, "starts": 12, "subs": 3, "g": 3, "a": 0, "W": 8, "D": 4, "L": 3}, "by_season": {"2020": {"apps": 15, "starts": 12, "subs": 3, "g": 3, "a": 0, "W": 8, "D": 4, "L": 3}}, "by_comp": {"League": {"apps": 15, "starts": 12, "subs": 3, "g": 3, "a": 0, "W": 8, "D": 4, "L": 3}}, "as_starter": {"W": 6, "D": 4, "L": 2}, "as_sub": {"W": 2, "D": 0, "L": 1}}, {"pc": "P021", "nick": "แพน", "name": "วรรธนัย มีสุข", "pos": "MF", "seasons": [2015], "total": {"apps": 14, "starts": 8, "subs": 6, "g": 2, "a": 3, "W": 5, "D": 2, "L": 7}, "by_season": {"2015": {"apps": 14, "starts": 8, "subs": 6, "g": 2, "a": 3, "W": 5, "D": 2, "L": 7}}, "by_comp": {"League": {"apps": 14, "starts": 8, "subs": 6, "g": 2, "a": 3, "W": 5, "D": 2, "L": 7}}, "as_starter": {"W": 3, "D": 1, "L": 4}, "as_sub": {"W": 2, "D": 1, "L": 3}}, {"pc": "P040", "nick": "สตางค์", "name": "ฐิติวัฒน์ มาสุข", "pos": "GK", "seasons": [2015, 2016], "total": {"apps": 14, "starts": 14, "subs": 0, "g": 0, "a": 0, "W": 4, "D": 5, "L": 5}, "by_season": {"2015": {"apps": 11, "starts": 11, "subs": 0, "g": 0, "a": 0, "W": 4, "D": 3, "L": 4}, "2016": {"apps": 3, "starts": 3, "subs": 0, "g": 0, "a": 0, "W": 0, "D": 2, "L": 1}}, "by_comp": {"League": {"apps": 14, "starts": 14, "subs": 0, "g": 0, "a": 0, "W": 4, "D": 5, "L": 5}}, "as_starter": {"W": 4, "D": 5, "L": 5}, "as_sub": {"W": 0, "D": 0, "L": 0}}, {"pc": "P046", "nick": "Dom", "name": "Dominic Louis Furness", "pos": "MF", "seasons": [2016], "total": {"apps": 14, "starts": 12, "subs": 2, "g": 2, "a": 1, "W": 8, "D": 4, "L": 2}, "by_season": {"2016": {"apps": 14, "starts": 12, "subs": 2, "g": 2, "a": 1, "W": 8, "D": 4, "L": 2}}, "by_comp": {"League": {"apps": 14, "starts": 12, "subs": 2, "g": 2, "a": 1, "W": 8, "D": 4, "L": 2}}, "as_starter": {"W": 7, "D": 3, "L": 2}, "as_sub": {"W": 1, "D": 1, "L": 0}}, {"pc": "P138", "nick": "โย", "name": "ศุภกฤต ท้าวก๋า", "pos": "MF", "seasons": [2023, 2024, 2025], "total": {"apps": 14, "starts": 10, "subs": 4, "g": 0, "a": 1, "W": 3, "D": 3, "L": 8}, "by_season": {"2023": {"apps": 7, "starts": 6, "subs": 1, "g": 0, "a": 1, "W": 0, "D": 2, "L": 5}, "2024": {"apps": 4, "starts": 2, "subs": 2, "g": 0, "a": 0, "W": 2, "D": 0, "L": 2}, "2025": {"apps": 3, "starts": 2, "subs": 1, "g": 0, "a": 0, "W": 1, "D": 1, "L": 1}}, "by_comp": {"League": {"apps": 10, "starts": 7, "subs": 3, "g": 0, "a": 1, "W": 1, "D": 3, "L": 6}, "Cup": {"apps": 4, "starts": 3, "subs": 1, "g": 0, "a": 0, "W": 2, "D": 0, "L": 2}}, "as_starter": {"W": 2, "D": 2, "L": 6}, "as_sub": {"W": 1, "D": 1, "L": 2}}, {"pc": "P037", "nick": "ผี", "name": "พีรพงศ์ ปัญญานุมาภรณ์ ", "pos": "MF", "seasons": [2015], "total": {"apps": 13, "starts": 10, "subs": 3, "g": 2, "a": 2, "W": 4, "D": 3, "L": 6}, "by_season": {"2015": {"apps": 13, "starts": 10, "subs": 3, "g": 2, "a": 2, "W": 4, "D": 3, "L": 6}}, "by_comp": {"League": {"apps": 13, "starts": 10, "subs": 3, "g": 2, "a": 2, "W": 4, "D": 3, "L": 6}}, "as_starter": {"W": 4, "D": 2, "L": 4}, "as_sub": {"W": 0, "D": 1, "L": 2}}, {"pc": "P062", "nick": "ชล", "name": "ปณวัตร ปราบสมรชัย", "pos": "GK", "seasons": [2017, 2018, 2019, 2023], "total": {"apps": 13, "starts": 12, "subs": 1, "g": 0, "a": 0, "W": 5, "D": 3, "L": 5}, "by_season": {"2017": {"apps": 2, "starts": 2, "subs": 0, "g": 0, "a": 0, "W": 2, "D": 0, "L": 0}, "2018": {"apps": 2, "starts": 2, "subs": 0, "g": 0, "a": 0, "W": 1, "D": 0, "L": 1}, "2019": {"apps": 5, "starts": 5, "subs": 0, "g": 0, "a": 0, "W": 0, "D": 3, "L": 2}, "2023": {"apps": 4, "starts": 3, "subs": 1, "g": 0, "a": 0, "W": 2, "D": 0, "L": 2}}, "by_comp": {"League": {"apps": 13, "starts": 12, "subs": 1, "g": 0, "a": 0, "W": 5, "D": 3, "L": 5}}, "as_starter": {"W": 4, "D": 3, "L": 5}, "as_sub": {"W": 1, "D": 0, "L": 0}}, {"pc": "P077", "nick": "Julee", "name": "จูลี่ ชุควูมา", "pos": "FC", "seasons": [2018], "total": {"apps": 13, "starts": 12, "subs": 1, "g": 6, "a": 1, "W": 7, "D": 1, "L": 5}, "by_season": {"2018": {"apps": 13, "starts": 12, "subs": 1, "g": 6, "a": 1, "W": 7, "D": 1, "L": 5}}, "by_comp": {"League": {"apps": 13, "starts": 12, "subs": 1, "g": 6, "a": 1, "W": 7, "D": 1, "L": 5}}, "as_starter": {"W": 7, "D": 1, "L": 4}, "as_sub": {"W": 0, "D": 0, "L": 1}}, {"pc": "P086", "nick": "Kunie", "name": "Kunie Kitamoto", "pos": "DF", "seasons": [2019], "total": {"apps": 13, "starts": 13, "subs": 0, "g": 0, "a": 0, "W": 7, "D": 3, "L": 3}, "by_season": {"2019": {"apps": 13, "starts": 13, "subs": 0, "g": 0, "a": 0, "W": 7, "D": 3, "L": 3}}, "by_comp": {"League": {"apps": 13, "starts": 13, "subs": 0, "g": 0, "a": 0, "W": 7, "D": 3, "L": 3}}, "as_starter": {"W": 7, "D": 3, "L": 3}, "as_sub": {"W": 0, "D": 0, "L": 0}}, {"pc": "P089", "nick": "แบรี่", "name": "Barry Lelouma", "pos": "MF", "seasons": [2019], "total": {"apps": 13, "starts": 13, "subs": 0, "g": 2, "a": 3, "W": 7, "D": 3, "L": 3}, "by_season": {"2019": {"apps": 13, "starts": 13, "subs": 0, "g": 2, "a": 3, "W": 7, "D": 3, "L": 3}}, "by_comp": {"League": {"apps": 13, "starts": 13, "subs": 0, "g": 2, "a": 3, "W": 7, "D": 3, "L": 3}}, "as_starter": {"W": 7, "D": 3, "L": 3}, "as_sub": {"W": 0, "D": 0, "L": 0}}, {"pc": "P122", "nick": "คิว", "name": "ชุติพนธ์ แท่นทรัพย์", "pos": "MF", "seasons": [2021, 2022, 2023, 2024], "total": {"apps": 13, "starts": 8, "subs": 5, "g": 0, "a": 0, "W": 0, "D": 3, "L": 10}, "by_season": {"2021": {"apps": 1, "starts": 0, "subs": 1, "g": 0, "a": 0, "W": 0, "D": 1, "L": 0}, "2022": {"apps": 1, "starts": 1, "subs": 0, "g": 0, "a": 0, "W": 0, "D": 0, "L": 1}, "2023": {"apps": 6, "starts": 5, "subs": 1, "g": 0, "a": 0, "W": 0, "D": 2, "L": 4}, "2024": {"apps": 5, "starts": 2, "subs": 3, "g": 0, "a": 0, "W": 0, "D": 0, "L": 5}}, "by_comp": {"League": {"apps": 11, "starts": 7, "subs": 4, "g": 0, "a": 0, "W": 0, "D": 3, "L": 8}, "Cup": {"apps": 2, "starts": 1, "subs": 1, "g": 0, "a": 0, "W": 0, "D": 0, "L": 2}}, "as_starter": {"W": 0, "D": 2, "L": 6}, "as_sub": {"W": 0, "D": 1, "L": 4}}, {"pc": "P008", "nick": "บาส", "name": "สิทธิพันธ์ ชุมช่วย", "pos": "MF", "seasons": [2015], "total": {"apps": 12, "starts": 11, "subs": 1, "g": 2, "a": 1, "W": 8, "D": 1, "L": 3}, "by_season": {"2015": {"apps": 12, "starts": 11, "subs": 1, "g": 2, "a": 1, "W": 8, "D": 1, "L": 3}}, "by_comp": {"League": {"apps": 12, "starts": 11, "subs": 1, "g": 2, "a": 1, "W": 8, "D": 1, "L": 3}}, "as_starter": {"W": 7, "D": 1, "L": 3}, "as_sub": {"W": 1, "D": 0, "L": 0}}, {"pc": "P072", "nick": "คิม", "name": "คิม จุนโฮ", "pos": "FC", "seasons": [2018], "total": {"apps": 12, "starts": 11, "subs": 1, "g": 1, "a": 2, "W": 6, "D": 3, "L": 3}, "by_season": {"2018": {"apps": 12, "starts": 11, "subs": 1, "g": 1, "a": 2, "W": 6, "D": 3, "L": 3}}, "by_comp": {"League": {"apps": 12, "starts": 11, "subs": 1, "g": 1, "a": 2, "W": 6, "D": 3, "L": 3}}, "as_starter": {"W": 5, "D": 3, "L": 3}, "as_sub": {"W": 1, "D": 0, "L": 0}}, {"pc": "P088", "nick": "Fereira", "name": "Fereira", "pos": "FC", "seasons": [2019], "total": {"apps": 12, "starts": 11, "subs": 1, "g": 2, "a": 2, "W": 7, "D": 2, "L": 3}, "by_season": {"2019": {"apps": 12, "starts": 11, "subs": 1, "g": 2, "a": 2, "W": 7, "D": 2, "L": 3}}, "by_comp": {"League": {"apps": 12, "starts": 11, "subs": 1, "g": 2, "a": 2, "W": 7, "D": 2, "L": 3}}, "as_starter": {"W": 7, "D": 1, "L": 3}, "as_sub": {"W": 0, "D": 1, "L": 0}}, {"pc": "P112", "nick": "Nico", "name": "Nico Bergold", "pos": "DF", "seasons": [2021], "total": {"apps": 12, "starts": 11, "subs": 1, "g": 0, "a": 0, "W": 6, "D": 3, "L": 3}, "by_season": {"2021": {"apps": 12, "starts": 11, "subs": 1, "g": 0, "a": 0, "W": 6, "D": 3, "L": 3}}, "by_comp": {"League": {"apps": 12, "starts": 11, "subs": 1, "g": 0, "a": 0, "W": 6, "D": 3, "L": 3}}, "as_starter": {"W": 5, "D": 3, "L": 3}, "as_sub": {"W": 1, "D": 0, "L": 0}}, {"pc": "P039", "nick": "ซอง", "name": "Jeong Kwang Sik", "pos": "MF", "seasons": [2015], "total": {"apps": 11, "starts": 1, "subs": 10, "g": 1, "a": 0, "W": 4, "D": 0, "L": 7}, "by_season": {"2015": {"apps": 11, "starts": 1, "subs": 10, "g": 1, "a": 0, "W": 4, "D": 0, "L": 7}}, "by_comp": {"League": {"apps": 11, "starts": 1, "subs": 10, "g": 1, "a": 0, "W": 4, "D": 0, "L": 7}}, "as_starter": {"W": 0, "D": 0, "L": 1}, "as_sub": {"W": 4, "D": 0, "L": 6}}, {"pc": "P044", "nick": "ต้น", "name": "วัชรพงษ์ บัวศรี", "pos": "FC", "seasons": [2016], "total": {"apps": 11, "starts": 6, "subs": 5, "g": 2, "a": 1, "W": 4, "D": 4, "L": 3}, "by_season": {"2016": {"apps": 11, "starts": 6, "subs": 5, "g": 2, "a": 1, "W": 4, "D": 4, "L": 3}}, "by_comp": {"League": {"apps": 11, "starts": 6, "subs": 5, "g": 2, "a": 1, "W": 4, "D": 4, "L": 3}}, "as_starter": {"W": 2, "D": 3, "L": 1}, "as_sub": {"W": 2, "D": 1, "L": 2}}, {"pc": "P071", "nick": "ฮาน", "name": "ฮาน จีซุง", "pos": "DF", "seasons": [2018], "total": {"apps": 11, "starts": 10, "subs": 1, "g": 0, "a": 0, "W": 4, "D": 4, "L": 3}, "by_season": {"2018": {"apps": 11, "starts": 10, "subs": 1, "g": 0, "a": 0, "W": 4, "D": 4, "L": 3}}, "by_comp": {"League": {"apps": 11, "starts": 10, "subs": 1, "g": 0, "a": 0, "W": 4, "D": 4, "L": 3}}, "as_starter": {"W": 3, "D": 4, "L": 3}, "as_sub": {"W": 1, "D": 0, "L": 0}}, {"pc": "P079", "nick": "อันโดะ", "name": "อันโดะ โอคามูระ", "pos": "MF", "seasons": [2019], "total": {"apps": 11, "starts": 8, "subs": 3, "g": 1, "a": 0, "W": 0, "D": 4, "L": 7}, "by_season": {"2019": {"apps": 11, "starts": 8, "subs": 3, "g": 1, "a": 0, "W": 0, "D": 4, "L": 7}}, "by_comp": {"League": {"apps": 11, "starts": 8, "subs": 3, "g": 1, "a": 0, "W": 0, "D": 4, "L": 7}}, "as_starter": {"W": 0, "D": 3, "L": 5}, "as_sub": {"W": 0, "D": 1, "L": 2}}, {"pc": "P087", "nick": "แบงค์", "name": "ธนา ศรีพันดร", "pos": "DF", "seasons": [2019], "total": {"apps": 11, "starts": 11, "subs": 0, "g": 0, "a": 0, "W": 7, "D": 2, "L": 2}, "by_season": {"2019": {"apps": 11, "starts": 11, "subs": 0, "g": 0, "a": 0, "W": 7, "D": 2, "L": 2}}, "by_comp": {"League": {"apps": 11, "starts": 11, "subs": 0, "g": 0, "a": 0, "W": 7, "D": 2, "L": 2}}, "as_starter": {"W": 7, "D": 2, "L": 2}, "as_sub": {"W": 0, "D": 0, "L": 0}}, {"pc": "P117", "nick": "อาร์ท", "name": "พงศกร สุขประมูล", "pos": "DF", "seasons": [2021, 2022, 2023, 2024, 2025], "total": {"apps": 11, "starts": 7, "subs": 4, "g": 0, "a": 0, "W": 3, "D": 4, "L": 4}, "by_season": {"2021": {"apps": 1, "starts": 0, "subs": 1, "g": 0, "a": 0, "W": 1, "D": 0, "L": 0}, "2022": {"apps": 1, "starts": 1, "subs": 0, "g": 0, "a": 0, "W": 1, "D": 0, "L": 0}, "2023": {"apps": 4, "starts": 2, "subs": 2, "g": 0, "a": 0, "W": 0, "D": 3, "L": 1}, "2024": {"apps": 4, "starts": 3, "subs": 1, "g": 0, "a": 0, "W": 0, "D": 1, "L": 3}, "2025": {"apps": 1, "starts": 1, "subs": 0, "g": 0, "a": 0, "W": 1, "D": 0, "L": 0}}, "by_comp": {"League": {"apps": 8, "starts": 5, "subs": 3, "g": 0, "a": 0, "W": 2, "D": 4, "L": 2}, "Cup": {"apps": 3, "starts": 2, "subs": 1, "g": 0, "a": 0, "W": 1, "D": 0, "L": 2}}, "as_starter": {"W": 2, "D": 2, "L": 3}, "as_sub": {"W": 1, "D": 2, "L": 1}}, {"pc": "P136", "nick": "โต้ง", "name": "สุรดิษ นามต้นทอง", "pos": "GK", "seasons": [2023, 2024, 2025], "total": {"apps": 11, "starts": 9, "subs": 2, "g": 0, "a": 0, "W": 2, "D": 4, "L": 5}, "by_season": {"2023": {"apps": 8, "starts": 7, "subs": 1, "g": 0, "a": 0, "W": 1, "D": 4, "L": 3}, "2024": {"apps": 1, "starts": 1, "subs": 0, "g": 0, "a": 0, "W": 0, "D": 0, "L": 1}, "2025": {"apps": 2, "starts": 1, "subs": 1, "g": 0, "a": 0, "W": 1, "D": 0, "L": 1}}, "by_comp": {"League": {"apps": 10, "starts": 8, "subs": 2, "g": 0, "a": 0, "W": 2, "D": 4, "L": 4}, "Cup": {"apps": 1, "starts": 1, "subs": 0, "g": 0, "a": 0, "W": 0, "D": 0, "L": 1}}, "as_starter": {"W": 2, "D": 3, "L": 4}, "as_sub": {"W": 0, "D": 1, "L": 1}}, {"pc": "P030", "nick": "นุ", "name": "ภานุพงษ์ รุ่งสุรีย์", "pos": "MF", "seasons": [2016, 2017, 2018, 2019], "total": {"apps": 10, "starts": 3, "subs": 7, "g": 1, "a": 0, "W": 3, "D": 4, "L": 3}, "by_season": {"2016": {"apps": 3, "starts": 2, "subs": 1, "g": 0, "a": 0, "W": 1, "D": 1, "L": 1}, "2017": {"apps": 4, "starts": 0, "subs": 4, "g": 0, "a": 0, "W": 2, "D": 1, "L": 1}, "2018": {"apps": 1, "starts": 0, "subs": 1, "g": 0, "a": 0, "W": 0, "D": 0, "L": 1}, "2019": {"apps": 2, "starts": 1, "subs": 1, "g": 1, "a": 0, "W": 0, "D": 2, "L": 0}}, "by_comp": {"League": {"apps": 10, "starts": 3, "subs": 7, "g": 1, "a": 0, "W": 3, "D": 4, "L": 3}}, "as_starter": {"W": 0, "D": 2, "L": 1}, "as_sub": {"W": 3, "D": 2, "L": 2}}, {"pc": "P004", "nick": "วิน", "name": "พิทยุตท์ อื้อศรีวงศ์", "pos": "DF", "seasons": [2015, 2017, 2018], "total": {"apps": 9, "starts": 9, "subs": 0, "g": 0, "a": 0, "W": 6, "D": 2, "L": 1}, "by_season": {"2015": {"apps": 2, "starts": 2, "subs": 0, "g": 0, "a": 0, "W": 0, "D": 2, "L": 0}, "2017": {"apps": 4, "starts": 4, "subs": 0, "g": 0, "a": 0, "W": 3, "D": 0, "L": 1}, "2018": {"apps": 3, "starts": 3, "subs": 0, "g": 0, "a": 0, "W": 3, "D": 0, "L": 0}}, "by_comp": {"League": {"apps": 9, "starts": 9, "subs": 0, "g": 0, "a": 0, "W": 6, "D": 2, "L": 1}}, "as_starter": {"W": 6, "D": 2, "L": 1}, "as_sub": {"W": 0, "D": 0, "L": 0}}, {"pc": "P009", "nick": "หนึ่ง", "name": "ศักดิ์นรินทร์ ปิ่นใจกุล", "pos": "FC", "seasons": [2015], "total": {"apps": 9, "starts": 2, "subs": 7, "g": 1, "a": 0, "W": 3, "D": 2, "L": 4}, "by_season": {"2015": {"apps": 9, "starts": 2, "subs": 7, "g": 1, "a": 0, "W": 3, "D": 2, "L": 4}}, "by_comp": {"League": {"apps": 9, "starts": 2, "subs": 7, "g": 1, "a": 0, "W": 3, "D": 2, "L": 4}}, "as_starter": {"W": 2, "D": 0, "L": 0}, "as_sub": {"W": 1, "D": 2, "L": 4}}, {"pc": "P059", "nick": "Hiek", "name": "Valery Hiek", "pos": "DF", "seasons": [2016], "total": {"apps": 9, "starts": 9, "subs": 0, "g": 3, "a": 0, "W": 5, "D": 3, "L": 1}, "by_season": {"2016": {"apps": 9, "starts": 9, "subs": 0, "g": 3, "a": 0, "W": 5, "D": 3, "L": 1}}, "by_comp": {"League": {"apps": 9, "starts": 9, "subs": 0, "g": 3, "a": 0, "W": 5, "D": 3, "L": 1}}, "as_starter": {"W": 5, "D": 3, "L": 1}, "as_sub": {"W": 0, "D": 0, "L": 0}}, {"pc": "P101", "nick": "Machado", "name": "Allan Machado", "pos": "FC", "seasons": [2021], "total": {"apps": 9, "starts": 6, "subs": 3, "g": 2, "a": 2, "W": 4, "D": 5, "L": 0}, "by_season": {"2021": {"apps": 9, "starts": 6, "subs": 3, "g": 2, "a": 2, "W": 4, "D": 5, "L": 0}}, "by_comp": {"League": {"apps": 9, "starts": 6, "subs": 3, "g": 2, "a": 2, "W": 4, "D": 5, "L": 0}}, "as_starter": {"W": 3, "D": 3, "L": 0}, "as_sub": {"W": 1, "D": 2, "L": 0}}, {"pc": "P144", "nick": "Hanley", "name": "TISHAN TAJAHNI HANLEY", "pos": "FC", "seasons": [2024], "total": {"apps": 9, "starts": 7, "subs": 2, "g": 1, "a": 1, "W": 3, "D": 3, "L": 3}, "by_season": {"2024": {"apps": 9, "starts": 7, "subs": 2, "g": 1, "a": 1, "W": 3, "D": 3, "L": 3}}, "by_comp": {"League": {"apps": 9, "starts": 7, "subs": 2, "g": 1, "a": 1, "W": 3, "D": 3, "L": 3}}, "as_starter": {"W": 3, "D": 1, "L": 3}, "as_sub": {"W": 0, "D": 2, "L": 0}}, {"pc": "P150", "nick": "Elie", "name": "ELIE, JEAN-JACQUES LOBOUET", "pos": "DF", "seasons": [2024], "total": {"apps": 9, "starts": 9, "subs": 0, "g": 1, "a": 0, "W": 2, "D": 3, "L": 4}, "by_season": {"2024": {"apps": 9, "starts": 9, "subs": 0, "g": 1, "a": 0, "W": 2, "D": 3, "L": 4}}, "by_comp": {"League": {"apps": 9, "starts": 9, "subs": 0, "g": 1, "a": 0, "W": 2, "D": 3, "L": 4}}, "as_starter": {"W": 2, "D": 3, "L": 4}, "as_sub": {"W": 0, "D": 0, "L": 0}}, {"pc": "P005", "nick": "แมค", "name": "ฉัตรฐานันท์ รักโคตร", "pos": "DF", "seasons": [2015], "total": {"apps": 8, "starts": 6, "subs": 2, "g": 1, "a": 0, "W": 3, "D": 3, "L": 2}, "by_season": {"2015": {"apps": 8, "starts": 6, "subs": 2, "g": 1, "a": 0, "W": 3, "D": 3, "L": 2}}, "by_comp": {"League": {"apps": 8, "starts": 6, "subs": 2, "g": 1, "a": 0, "W": 3, "D": 3, "L": 2}}, "as_starter": {"W": 2, "D": 3, "L": 1}, "as_sub": {"W": 1, "D": 0, "L": 1}}, {"pc": "P070", "nick": "อลาซาน", "name": "อลาซาน อามัลโก้", "pos": "MF", "seasons": [2017], "total": {"apps": 8, "starts": 8, "subs": 0, "g": 1, "a": 8, "W": 6, "D": 1, "L": 1}, "by_season": {"2017": {"apps": 8, "starts": 8, "subs": 0, "g": 1, "a": 8, "W": 6, "D": 1, "L": 1}}, "by_comp": {"League": {"apps": 8, "starts": 8, "subs": 0, "g": 1, "a": 8, "W": 6, "D": 1, "L": 1}}, "as_starter": {"W": 6, "D": 1, "L": 1}, "as_sub": {"W": 0, "D": 0, "L": 0}}, {"pc": "P091", "nick": "เต้", "name": "ภูมินทร์ สายลุน", "pos": "MF", "seasons": [2019, 2020, 2021, 2022], "total": {"apps": 8, "starts": 3, "subs": 5, "g": 0, "a": 0, "W": 6, "D": 1, "L": 1}, "by_season": {"2019": {"apps": 1, "starts": 0, "subs": 1, "g": 0, "a": 0, "W": 0, "D": 1, "L": 0}, "2020": {"apps": 1, "starts": 0, "subs": 1, "g": 0, "a": 0, "W": 1, "D": 0, "L": 0}, "2021": {"apps": 5, "starts": 3, "subs": 2, "g": 0, "a": 0, "W": 5, "D": 0, "L": 0}, "2022": {"apps": 1, "starts": 0, "subs": 1, "g": 0, "a": 0, "W": 0, "D": 0, "L": 1}}, "by_comp": {"League": {"apps": 8, "starts": 3, "subs": 5, "g": 0, "a": 0, "W": 6, "D": 1, "L": 1}}, "as_starter": {"W": 3, "D": 0, "L": 0}, "as_sub": {"W": 3, "D": 1, "L": 1}}, {"pc": "P147", "nick": "แดน", "name": "ธนบดี จันราช", "pos": "DF", "seasons": [2024, 2025], "total": {"apps": 8, "starts": 5, "subs": 3, "g": 0, "a": 0, "W": 2, "D": 1, "L": 5}, "by_season": {"2024": {"apps": 3, "starts": 1, "subs": 2, "g": 0, "a": 0, "W": 0, "D": 0, "L": 3}, "2025": {"apps": 5, "starts": 4, "subs": 1, "g": 0, "a": 0, "W": 2, "D": 1, "L": 2}}, "by_comp": {"League": {"apps": 6, "starts": 3, "subs": 3, "g": 0, "a": 0, "W": 1, "D": 1, "L": 4}, "Cup": {"apps": 2, "starts": 2, "subs": 0, "g": 0, "a": 0, "W": 1, "D": 0, "L": 1}}, "as_starter": {"W": 1, "D": 1, "L": 3}, "as_sub": {"W": 1, "D": 0, "L": 2}}, {"pc": "P124", "nick": "แป๊ะ", "name": "ณัฐนนท์ อนันตะบุตร", "pos": "MF", "seasons": [2022], "total": {"apps": 7, "starts": 6, "subs": 1, "g": 0, "a": 1, "W": 5, "D": 1, "L": 1}, "by_season": {"2022": {"apps": 7, "starts": 6, "subs": 1, "g": 0, "a": 1, "W": 5, "D": 1, "L": 1}}, "by_comp": {"League": {"apps": 7, "starts": 6, "subs": 1, "g": 0, "a": 1, "W": 5, "D": 1, "L": 1}}, "as_starter": {"W": 4, "D": 1, "L": 1}, "as_sub": {"W": 1, "D": 0, "L": 0}}, {"pc": "P145", "nick": "ก้อง", "name": "ศรัณย์ภัทร จันทร์แจ่มใส", "pos": "MF", "seasons": [2024, 2025], "total": {"apps": 7, "starts": 2, "subs": 5, "g": 0, "a": 1, "W": 4, "D": 0, "L": 3}, "by_season": {"2024": {"apps": 4, "starts": 1, "subs": 3, "g": 0, "a": 0, "W": 2, "D": 0, "L": 2}, "2025": {"apps": 3, "starts": 1, "subs": 2, "g": 0, "a": 1, "W": 2, "D": 0, "L": 1}}, "by_comp": {"League": {"apps": 3, "starts": 0, "subs": 3, "g": 0, "a": 0, "W": 2, "D": 0, "L": 1}, "Cup": {"apps": 4, "starts": 2, "subs": 2, "g": 0, "a": 1, "W": 2, "D": 0, "L": 2}}, "as_starter": {"W": 2, "D": 0, "L": 0}, "as_sub": {"W": 2, "D": 0, "L": 3}}, {"pc": "P015", "nick": "ราม", "name": "ปัญญาวิทย์ แจ้งสว่าง", "pos": "FC", "seasons": [2017, 2018, 2019], "total": {"apps": 6, "starts": 1, "subs": 5, "g": 0, "a": 0, "W": 2, "D": 1, "L": 3}, "by_season": {"2017": {"apps": 2, "starts": 0, "subs": 2, "g": 0, "a": 0, "W": 1, "D": 1, "L": 0}, "2018": {"apps": 2, "starts": 1, "subs": 1, "g": 0, "a": 0, "W": 1, "D": 0, "L": 1}, "2019": {"apps": 2, "starts": 0, "subs": 2, "g": 0, "a": 0, "W": 0, "D": 0, "L": 2}}, "by_comp": {"League": {"apps": 6, "starts": 1, "subs": 5, "g": 0, "a": 0, "W": 2, "D": 1, "L": 3}}, "as_starter": {"W": 1, "D": 0, "L": 0}, "as_sub": {"W": 1, "D": 1, "L": 3}}, {"pc": "P024", "nick": "กาย", "name": "นนทวัฒน์ มีของ", "pos": "MF", "seasons": [2016, 2017, 2019], "total": {"apps": 6, "starts": 3, "subs": 3, "g": 0, "a": 0, "W": 4, "D": 0, "L": 2}, "by_season": {"2016": {"apps": 2, "starts": 1, "subs": 1, "g": 0, "a": 0, "W": 1, "D": 0, "L": 1}, "2017": {"apps": 3, "starts": 2, "subs": 1, "g": 0, "a": 0, "W": 2, "D": 0, "L": 1}, "2019": {"apps": 1, "starts": 0, "subs": 1, "g": 0, "a": 0, "W": 1, "D": 0, "L": 0}}, "by_comp": {"League": {"apps": 6, "starts": 3, "subs": 3, "g": 0, "a": 0, "W": 4, "D": 0, "L": 2}}, "as_starter": {"W": 1, "D": 0, "L": 2}, "as_sub": {"W": 3, "D": 0, "L": 0}}, {"pc": "P126", "nick": "เอก", "name": "สมภพ นิลวงษ์", "pos": "DF", "seasons": [2022], "total": {"apps": 6, "starts": 5, "subs": 1, "g": 0, "a": 0, "W": 2, "D": 2, "L": 2}, "by_season": {"2022": {"apps": 6, "starts": 5, "subs": 1, "g": 0, "a": 0, "W": 2, "D": 2, "L": 2}}, "by_comp": {"League": {"apps": 6, "starts": 5, "subs": 1, "g": 0, "a": 0, "W": 2, "D": 2, "L": 2}}, "as_starter": {"W": 1, "D": 2, "L": 2}, "as_sub": {"W": 1, "D": 0, "L": 0}}, {"pc": "P130", "nick": "นัท", "name": "ก้องภพ ปันนาจา", "pos": "GK", "seasons": [2023, 2025], "total": {"apps": 6, "starts": 6, "subs": 0, "g": 0, "a": 0, "W": 1, "D": 1, "L": 4}, "by_season": {"2023": {"apps": 4, "starts": 4, "subs": 0, "g": 0, "a": 0, "W": 0, "D": 1, "L": 3}, "2025": {"apps": 2, "starts": 2, "subs": 0, "g": 0, "a": 0, "W": 1, "D": 0, "L": 1}}, "by_comp": {"League": {"apps": 5, "starts": 5, "subs": 0, "g": 0, "a": 0, "W": 0, "D": 1, "L": 4}, "Cup": {"apps": 1, "starts": 1, "subs": 0, "g": 0, "a": 0, "W": 1, "D": 0, "L": 0}}, "as_starter": {"W": 1, "D": 1, "L": 4}, "as_sub": {"W": 0, "D": 0, "L": 0}}, {"pc": "P161", "nick": "เอซี", "name": "ศิรยศ ด่านสกุล", "pos": "MF", "seasons": [2025], "total": {"apps": 6, "starts": 5, "subs": 1, "g": 0, "a": 0, "W": 3, "D": 1, "L": 2}, "by_season": {"2025": {"apps": 6, "starts": 5, "subs": 1, "g": 0, "a": 0, "W": 3, "D": 1, "L": 2}}, "by_comp": {"League": {"apps": 6, "starts": 5, "subs": 1, "g": 0, "a": 0, "W": 3, "D": 1, "L": 2}}, "as_starter": {"W": 3, "D": 1, "L": 1}, "as_sub": {"W": 0, "D": 0, "L": 1}}, {"pc": "P017", "nick": "พีท", "name": "พิชญา หอมชื่น", "pos": "MF", "seasons": [2015], "total": {"apps": 5, "starts": 0, "subs": 5, "g": 0, "a": 0, "W": 3, "D": 0, "L": 2}, "by_season": {"2015": {"apps": 5, "starts": 0, "subs": 5, "g": 0, "a": 0, "W": 3, "D": 0, "L": 2}}, "by_comp": {"League": {"apps": 5, "starts": 0, "subs": 5, "g": 0, "a": 0, "W": 3, "D": 0, "L": 2}}, "as_starter": {"W": 0, "D": 0, "L": 0}, "as_sub": {"W": 3, "D": 0, "L": 2}}, {"pc": "P029", "nick": "จิล", "name": "จิล ซีมาร์", "pos": "MF", "seasons": [2015], "total": {"apps": 5, "starts": 4, "subs": 1, "g": 2, "a": 0, "W": 2, "D": 1, "L": 2}, "by_season": {"2015": {"apps": 5, "starts": 4, "subs": 1, "g": 2, "a": 0, "W": 2, "D": 1, "L": 2}}, "by_comp": {"League": {"apps": 5, "starts": 4, "subs": 1, "g": 2, "a": 0, "W": 2, "D": 1, "L": 2}}, "as_starter": {"W": 1, "D": 1, "L": 2}, "as_sub": {"W": 1, "D": 0, "L": 0}}, {"pc": "P041", "nick": "โฟฟาน่า", "name": "Brahima Fofana", "pos": "MF", "seasons": [2015], "total": {"apps": 5, "starts": 4, "subs": 1, "g": 1, "a": 1, "W": 2, "D": 1, "L": 2}, "by_season": {"2015": {"apps": 5, "starts": 4, "subs": 1, "g": 1, "a": 1, "W": 2, "D": 1, "L": 2}}, "by_comp": {"League": {"apps": 5, "starts": 4, "subs": 1, "g": 1, "a": 1, "W": 2, "D": 1, "L": 2}}, "as_starter": {"W": 2, "D": 1, "L": 1}, "as_sub": {"W": 0, "D": 0, "L": 1}}, {"pc": "P061", "nick": "โด้", "name": "ภัทรพล เจียมกิ่ง", "pos": "FC", "seasons": [2017, 2018, 2019], "total": {"apps": 5, "starts": 0, "subs": 5, "g": 0, "a": 0, "W": 2, "D": 1, "L": 2}, "by_season": {"2017": {"apps": 3, "starts": 0, "subs": 3, "g": 0, "a": 0, "W": 1, "D": 0, "L": 2}, "2018": {"apps": 1, "starts": 0, "subs": 1, "g": 0, "a": 0, "W": 1, "D": 0, "L": 0}, "2019": {"apps": 1, "starts": 0, "subs": 1, "g": 0, "a": 0, "W": 0, "D": 1, "L": 0}}, "by_comp": {"League": {"apps": 5, "starts": 0, "subs": 5, "g": 0, "a": 0, "W": 2, "D": 1, "L": 2}}, "as_starter": {"W": 0, "D": 0, "L": 0}, "as_sub": {"W": 2, "D": 1, "L": 2}}, {"pc": "P096", "nick": "ตุลย์", "name": "ชนุตติ์ พิสิทธิ์ศักดิ์", "pos": "DF", "seasons": [2020], "total": {"apps": 5, "starts": 4, "subs": 1, "g": 0, "a": 0, "W": 3, "D": 1, "L": 1}, "by_season": {"2020": {"apps": 5, "starts": 4, "subs": 1, "g": 0, "a": 0, "W": 3, "D": 1, "L": 1}}, "by_comp": {"League": {"apps": 5, "starts": 4, "subs": 1, "g": 0, "a": 0, "W": 3, "D": 1, "L": 1}}, "as_starter": {"W": 2, "D": 1, "L": 1}, "as_sub": {"W": 1, "D": 0, "L": 0}}, {"pc": "P146", "nick": "เทีย", "name": "นันทพงศ์ ไทยศรี", "pos": "FC", "seasons": [2024], "total": {"apps": 5, "starts": 4, "subs": 1, "g": 2, "a": 1, "W": 2, "D": 0, "L": 3}, "by_season": {"2024": {"apps": 5, "starts": 4, "subs": 1, "g": 2, "a": 1, "W": 2, "D": 0, "L": 3}}, "by_comp": {"League": {"apps": 4, "starts": 3, "subs": 1, "g": 1, "a": 1, "W": 2, "D": 0, "L": 2}, "Cup": {"apps": 1, "starts": 1, "subs": 0, "g": 1, "a": 0, "W": 0, "D": 0, "L": 1}}, "as_starter": {"W": 1, "D": 0, "L": 3}, "as_sub": {"W": 1, "D": 0, "L": 0}}, {"pc": "P152", "nick": "Uche", "name": "Uche", "pos": "FC", "seasons": [2024], "total": {"apps": 5, "starts": 0, "subs": 5, "g": 1, "a": 0, "W": 1, "D": 1, "L": 3}, "by_season": {"2024": {"apps": 5, "starts": 0, "subs": 5, "g": 1, "a": 0, "W": 1, "D": 1, "L": 3}}, "by_comp": {"League": {"apps": 5, "starts": 0, "subs": 5, "g": 1, "a": 0, "W": 1, "D": 1, "L": 3}}, "as_starter": {"W": 0, "D": 0, "L": 0}, "as_sub": {"W": 1, "D": 1, "L": 3}}, {"pc": "P159", "nick": "แตมป์", "name": "ธนดล เหมบุพการี", "pos": "MF", "seasons": [2025], "total": {"apps": 5, "starts": 3, "subs": 2, "g": 0, "a": 0, "W": 1, "D": 0, "L": 4}, "by_season": {"2025": {"apps": 5, "starts": 3, "subs": 2, "g": 0, "a": 0, "W": 1, "D": 0, "L": 4}}, "by_comp": {"League": {"apps": 5, "starts": 3, "subs": 2, "g": 0, "a": 0, "W": 1, "D": 0, "L": 4}}, "as_starter": {"W": 0, "D": 0, "L": 3}, "as_sub": {"W": 1, "D": 0, "L": 1}}, {"pc": "P111", "nick": "โดม", "name": "ธิติวุฒิ ไวยเดช", "pos": "FC", "seasons": [2021], "total": {"apps": 4, "starts": 0, "subs": 4, "g": 1, "a": 1, "W": 1, "D": 2, "L": 1}, "by_season": {"2021": {"apps": 4, "starts": 0, "subs": 4, "g": 1, "a": 1, "W": 1, "D": 2, "L": 1}}, "by_comp": {"League": {"apps": 4, "starts": 0, "subs": 4, "g": 1, "a": 1, "W": 1, "D": 2, "L": 1}}, "as_starter": {"W": 0, "D": 0, "L": 0}, "as_sub": {"W": 1, "D": 2, "L": 1}}, {"pc": "P143", "nick": "ตองอู", "name": "สิทธิพล จำปาเรือง", "pos": "MF", "seasons": [2023], "total": {"apps": 4, "starts": 3, "subs": 1, "g": 0, "a": 0, "W": 0, "D": 1, "L": 3}, "by_season": {"2023": {"apps": 4, "starts": 3, "subs": 1, "g": 0, "a": 0, "W": 0, "D": 1, "L": 3}}, "by_comp": {"League": {"apps": 4, "starts": 3, "subs": 1, "g": 0, "a": 0, "W": 0, "D": 1, "L": 3}}, "as_starter": {"W": 0, "D": 1, "L": 2}, "as_sub": {"W": 0, "D": 0, "L": 1}}, {"pc": "P085", "nick": "ตูน", "name": "สรชัช พบประเสริฐ", "pos": "MF", "seasons": [2019, 2021, 2022], "total": {"apps": 3, "starts": 1, "subs": 2, "g": 0, "a": 0, "W": 2, "D": 1, "L": 0}, "by_season": {"2019": {"apps": 1, "starts": 0, "subs": 1, "g": 0, "a": 0, "W": 1, "D": 0, "L": 0}, "2021": {"apps": 1, "starts": 1, "subs": 0, "g": 0, "a": 0, "W": 0, "D": 1, "L": 0}, "2022": {"apps": 1, "starts": 0, "subs": 1, "g": 0, "a": 0, "W": 1, "D": 0, "L": 0}}, "by_comp": {"League": {"apps": 3, "starts": 1, "subs": 2, "g": 0, "a": 0, "W": 2, "D": 1, "L": 0}}, "as_starter": {"W": 0, "D": 1, "L": 0}, "as_sub": {"W": 2, "D": 0, "L": 0}}, {"pc": "P109", "nick": "แบงค์", "name": "ธนากร ยงค์สถิตย์สุข", "pos": "FC", "seasons": [2021], "total": {"apps": 3, "starts": 1, "subs": 2, "g": 0, "a": 0, "W": 2, "D": 0, "L": 1}, "by_season": {"2021": {"apps": 3, "starts": 1, "subs": 2, "g": 0, "a": 0, "W": 2, "D": 0, "L": 1}}, "by_comp": {"League": {"apps": 3, "starts": 1, "subs": 2, "g": 0, "a": 0, "W": 2, "D": 0, "L": 1}}, "as_starter": {"W": 1, "D": 0, "L": 0}, "as_sub": {"W": 1, "D": 0, "L": 1}}, {"pc": "P157", "nick": "ฮามิช", "name": "จินตภัตร มะเส็ง", "pos": "MF", "seasons": [2025], "total": {"apps": 3, "starts": 3, "subs": 0, "g": 0, "a": 0, "W": 0, "D": 0, "L": 3}, "by_season": {"2025": {"apps": 3, "starts": 3, "subs": 0, "g": 0, "a": 0, "W": 0, "D": 0, "L": 3}}, "by_comp": {"League": {"apps": 2, "starts": 2, "subs": 0, "g": 0, "a": 0, "W": 0, "D": 0, "L": 2}, "Cup": {"apps": 1, "starts": 1, "subs": 0, "g": 0, "a": 0, "W": 0, "D": 0, "L": 1}}, "as_starter": {"W": 0, "D": 0, "L": 3}, "as_sub": {"W": 0, "D": 0, "L": 0}}, {"pc": "P002", "nick": "ลี", "name": "วิชัย มนมิตร", "pos": "DF", "seasons": [2015], "total": {"apps": 2, "starts": 1, "subs": 1, "g": 0, "a": 0, "W": 0, "D": 1, "L": 1}, "by_season": {"2015": {"apps": 2, "starts": 1, "subs": 1, "g": 0, "a": 0, "W": 0, "D": 1, "L": 1}}, "by_comp": {"League": {"apps": 2, "starts": 1, "subs": 1, "g": 0, "a": 0, "W": 0, "D": 1, "L": 1}}, "as_starter": {"W": 0, "D": 1, "L": 0}, "as_sub": {"W": 0, "D": 0, "L": 1}}, {"pc": "P020", "nick": "เติ้ล", "name": "สานุพัฒน์ พามาวงษ์", "pos": "MF", "seasons": [2015], "total": {"apps": 2, "starts": 0, "subs": 2, "g": 0, "a": 0, "W": 0, "D": 0, "L": 2}, "by_season": {"2015": {"apps": 2, "starts": 0, "subs": 2, "g": 0, "a": 0, "W": 0, "D": 0, "L": 2}}, "by_comp": {"League": {"apps": 2, "starts": 0, "subs": 2, "g": 0, "a": 0, "W": 0, "D": 0, "L": 2}}, "as_starter": {"W": 0, "D": 0, "L": 0}, "as_sub": {"W": 0, "D": 0, "L": 2}}, {"pc": "P049", "nick": "โก้", "name": "ณัฐวิชช์ พัชรพงศ์ธนวัต", "pos": "DF", "seasons": [2016], "total": {"apps": 2, "starts": 0, "subs": 2, "g": 0, "a": 0, "W": 2, "D": 0, "L": 0}, "by_season": {"2016": {"apps": 2, "starts": 0, "subs": 2, "g": 0, "a": 0, "W": 2, "D": 0, "L": 0}}, "by_comp": {"League": {"apps": 2, "starts": 0, "subs": 2, "g": 0, "a": 0, "W": 2, "D": 0, "L": 0}}, "as_starter": {"W": 0, "D": 0, "L": 0}, "as_sub": {"W": 2, "D": 0, "L": 0}}, {"pc": "P057", "nick": "เป็ด", "name": "วุธรัตน์ ธนสุคนธสิทธิ์", "pos": "DF", "seasons": [2016], "total": {"apps": 2, "starts": 2, "subs": 0, "g": 0, "a": 0, "W": 1, "D": 1, "L": 0}, "by_season": {"2016": {"apps": 2, "starts": 2, "subs": 0, "g": 0, "a": 0, "W": 1, "D": 1, "L": 0}}, "by_comp": {"League": {"apps": 2, "starts": 2, "subs": 0, "g": 0, "a": 0, "W": 1, "D": 1, "L": 0}}, "as_starter": {"W": 1, "D": 1, "L": 0}, "as_sub": {"W": 0, "D": 0, "L": 0}}, {"pc": "P073", "nick": "ลีโอ", "name": "บุญนิธิกร เอกศิริ", "pos": "DF", "seasons": [2018], "total": {"apps": 2, "starts": 0, "subs": 2, "g": 0, "a": 0, "W": 2, "D": 0, "L": 0}, "by_season": {"2018": {"apps": 2, "starts": 0, "subs": 2, "g": 0, "a": 0, "W": 2, "D": 0, "L": 0}}, "by_comp": {"League": {"apps": 2, "starts": 0, "subs": 2, "g": 0, "a": 0, "W": 2, "D": 0, "L": 0}}, "as_starter": {"W": 0, "D": 0, "L": 0}, "as_sub": {"W": 2, "D": 0, "L": 0}}, {"pc": "P092", "nick": "Bruno", "name": "Bruno", "pos": "FC", "seasons": [2020], "total": {"apps": 2, "starts": 2, "subs": 0, "g": 2, "a": 0, "W": 2, "D": 0, "L": 0}, "by_season": {"2020": {"apps": 2, "starts": 2, "subs": 0, "g": 2, "a": 0, "W": 2, "D": 0, "L": 0}}, "by_comp": {"League": {"apps": 2, "starts": 2, "subs": 0, "g": 2, "a": 0, "W": 2, "D": 0, "L": 0}}, "as_starter": {"W": 2, "D": 0, "L": 0}, "as_sub": {"W": 0, "D": 0, "L": 0}}, {"pc": "P106", "nick": "โฟล์ค", "name": "เตชะพงษ์ เพชรประภัสสร", "pos": "DF", "seasons": [2021], "total": {"apps": 2, "starts": 0, "subs": 2, "g": 0, "a": 0, "W": 2, "D": 0, "L": 0}, "by_season": {"2021": {"apps": 2, "starts": 0, "subs": 2, "g": 0, "a": 0, "W": 2, "D": 0, "L": 0}}, "by_comp": {"League": {"apps": 2, "starts": 0, "subs": 2, "g": 0, "a": 0, "W": 2, "D": 0, "L": 0}}, "as_starter": {"W": 0, "D": 0, "L": 0}, "as_sub": {"W": 2, "D": 0, "L": 0}}, {"pc": "P151", "nick": "โอเว่น", "name": "ธนศักดิ์ แก้วประสงค์", "pos": "FC", "seasons": [2025], "total": {"apps": 2, "starts": 0, "subs": 2, "g": 0, "a": 0, "W": 0, "D": 0, "L": 2}, "by_season": {"2025": {"apps": 2, "starts": 0, "subs": 2, "g": 0, "a": 0, "W": 0, "D": 0, "L": 2}}, "by_comp": {"League": {"apps": 2, "starts": 0, "subs": 2, "g": 0, "a": 0, "W": 0, "D": 0, "L": 2}}, "as_starter": {"W": 0, "D": 0, "L": 0}, "as_sub": {"W": 0, "D": 0, "L": 2}}, {"pc": "P160", "nick": "ปั๊บ", "name": "อดิศร วงศ์เสือ", "pos": "MF", "seasons": [2025], "total": {"apps": 2, "starts": 2, "subs": 0, "g": 0, "a": 0, "W": 0, "D": 0, "L": 2}, "by_season": {"2025": {"apps": 2, "starts": 2, "subs": 0, "g": 0, "a": 0, "W": 0, "D": 0, "L": 2}}, "by_comp": {"League": {"apps": 2, "starts": 2, "subs": 0, "g": 0, "a": 0, "W": 0, "D": 0, "L": 2}}, "as_starter": {"W": 0, "D": 0, "L": 2}, "as_sub": {"W": 0, "D": 0, "L": 0}}, {"pc": "P012", "nick": "ติ๊ก", "name": "ปิยะ จงรอบคอบ", "pos": "MF", "seasons": [2015], "total": {"apps": 1, "starts": 1, "subs": 0, "g": 0, "a": 0, "W": 0, "D": 1, "L": 0}, "by_season": {"2015": {"apps": 1, "starts": 1, "subs": 0, "g": 0, "a": 0, "W": 0, "D": 1, "L": 0}}, "by_comp": {"League": {"apps": 1, "starts": 1, "subs": 0, "g": 0, "a": 0, "W": 0, "D": 1, "L": 0}}, "as_starter": {"W": 0, "D": 1, "L": 0}, "as_sub": {"W": 0, "D": 0, "L": 0}}, {"pc": "P031", "nick": "กิ๊ก", "name": "คริสต์มาส ศรีแก้วใส", "pos": "MF", "seasons": [2015], "total": {"apps": 1, "starts": 0, "subs": 1, "g": 0, "a": 0, "W": 0, "D": 1, "L": 0}, "by_season": {"2015": {"apps": 1, "starts": 0, "subs": 1, "g": 0, "a": 0, "W": 0, "D": 1, "L": 0}}, "by_comp": {"League": {"apps": 1, "starts": 0, "subs": 1, "g": 0, "a": 0, "W": 0, "D": 1, "L": 0}}, "as_starter": {"W": 0, "D": 0, "L": 0}, "as_sub": {"W": 0, "D": 1, "L": 0}}, {"pc": "P099", "nick": "Park", "name": "Park", "pos": "DF", "seasons": [2020], "total": {"apps": 1, "starts": 1, "subs": 0, "g": 0, "a": 0, "W": 0, "D": 0, "L": 1}, "by_season": {"2020": {"apps": 1, "starts": 1, "subs": 0, "g": 0, "a": 0, "W": 0, "D": 0, "L": 1}}, "by_comp": {"League": {"apps": 1, "starts": 1, "subs": 0, "g": 0, "a": 0, "W": 0, "D": 0, "L": 1}}, "as_starter": {"W": 0, "D": 0, "L": 1}, "as_sub": {"W": 0, "D": 0, "L": 0}}, {"pc": "P113", "nick": "มาร์ดี้", "name": "มาร์ดี้", "pos": "FC", "seasons": [2021], "total": {"apps": 1, "starts": 1, "subs": 0, "g": 0, "a": 0, "W": 0, "D": 1, "L": 0}, "by_season": {"2021": {"apps": 1, "starts": 1, "subs": 0, "g": 0, "a": 0, "W": 0, "D": 1, "L": 0}}, "by_comp": {"League": {"apps": 1, "starts": 1, "subs": 0, "g": 0, "a": 0, "W": 0, "D": 1, "L": 0}}, "as_starter": {"W": 0, "D": 1, "L": 0}, "as_sub": {"W": 0, "D": 0, "L": 0}}, {"pc": "P118", "nick": "", "name": "อนลัส โสภาธรรมรังษี", "pos": "DF", "seasons": [2021], "total": {"apps": 1, "starts": 0, "subs": 1, "g": 0, "a": 0, "W": 1, "D": 0, "L": 0}, "by_season": {"2021": {"apps": 1, "starts": 0, "subs": 1, "g": 0, "a": 0, "W": 1, "D": 0, "L": 0}}, "by_comp": {"League": {"apps": 1, "starts": 0, "subs": 1, "g": 0, "a": 0, "W": 1, "D": 0, "L": 0}}, "as_starter": {"W": 0, "D": 0, "L": 0}, "as_sub": {"W": 1, "D": 0, "L": 0}}, {"pc": "P120", "nick": "อาร์ม", "name": "ศตวรรษ พิธกิจ", "pos": "GK", "seasons": [2021], "total": {"apps": 1, "starts": 1, "subs": 0, "g": 0, "a": 0, "W": 0, "D": 1, "L": 0}, "by_season": {"2021": {"apps": 1, "starts": 1, "subs": 0, "g": 0, "a": 0, "W": 0, "D": 1, "L": 0}}, "by_comp": {"League": {"apps": 1, "starts": 1, "subs": 0, "g": 0, "a": 0, "W": 0, "D": 1, "L": 0}}, "as_starter": {"W": 0, "D": 1, "L": 0}, "as_sub": {"W": 0, "D": 0, "L": 0}}, {"pc": "P121", "nick": "ไอซ์", "name": "รัชกร มอญแก้ว", "pos": "DF", "seasons": [2021], "total": {"apps": 1, "starts": 0, "subs": 1, "g": 0, "a": 0, "W": 0, "D": 1, "L": 0}, "by_season": {"2021": {"apps": 1, "starts": 0, "subs": 1, "g": 0, "a": 0, "W": 0, "D": 1, "L": 0}}, "by_comp": {"League": {"apps": 1, "starts": 0, "subs": 1, "g": 0, "a": 0, "W": 0, "D": 1, "L": 0}}, "as_starter": {"W": 0, "D": 0, "L": 0}, "as_sub": {"W": 0, "D": 1, "L": 0}}, {"pc": "P158", "nick": "Denis", "name": "Jean Denis", "pos": "FC", "seasons": [2025], "total": {"apps": 1, "starts": 0, "subs": 1, "g": 0, "a": 0, "W": 0, "D": 0, "L": 1}, "by_season": {"2025": {"apps": 1, "starts": 0, "subs": 1, "g": 0, "a": 0, "W": 0, "D": 0, "L": 1}}, "by_comp": {"Cup": {"apps": 1, "starts": 0, "subs": 1, "g": 0, "a": 0, "W": 0, "D": 0, "L": 1}}, "as_starter": {"W": 0, "D": 0, "L": 0}, "as_sub": {"W": 0, "D": 0, "L": 1}}];
 
-const PA = [{"pc":"P069","name":"กษิตินาถ ศรีภิรมย์","nick":"ฟรองค์","pos":"FC","apps":128,"starts":68,"subs":60,"g":29,"a":8,"gc":37,"seasons":[2017,2018,2019,2020,2021,2022,2023,2025]},{"pc":"P094","name":"ปราชญ์ปรีชา เพชรทอง","nick":"ปอ","pos":"FC","apps":104,"starts":89,"subs":15,"g":14,"a":12,"gc":26,"seasons":[2020,2021,2022,2023,2024]},{"pc":"P013","name":"ตะวัน สังขวิมล","nick":"ตะวัน","pos":"MF","apps":100,"starts":59,"subs":41,"g":5,"a":9,"gc":14,"seasons":[2015,2016,2017,2018,2019,2020,2021,2022]},{"pc":"P038","name":"พนมกรณ์ สายสอน","nick":"ป๊อก","pos":"MF","apps":99,"starts":81,"subs":18,"g":7,"a":20,"gc":27,"seasons":[2015,2016,2017,2018,2019]},{"pc":"P068","name":"ณัฐวัฒน์ โทบ้านซ้ง","nick":"ไฟฟ์","pos":"DF","apps":98,"starts":84,"subs":14,"g":5,"a":24,"gc":29,"seasons":[2017,2018,2019,2020,2021]},{"pc":"P102","name":"พรหมมินทร์ ปิ่นแก้ว","nick":"กอล์ฟ","pos":"MF","apps":82,"starts":69,"subs":13,"g":5,"a":7,"gc":12,"seasons":[2021,2022,2023,2024]},{"pc":"P054","name":"กริชชัย แสงรุ่ง","nick":"ปิ๊ก","pos":"GK","apps":78,"starts":78,"subs":0,"g":0,"a":1,"gc":1,"seasons":[2016,2017,2018,2019,2020,2021]},{"pc":"P090","name":"Mbengen","nick":"เบนเก้น","pos":"FC","apps":78,"starts":74,"subs":4,"g":31,"a":22,"gc":53,"seasons":[2019,2020,2021,2022]},{"pc":"P063","name":"ประกายเกียรติ สุขคง","nick":"แมน","pos":"MF","apps":76,"starts":69,"subs":7,"g":9,"a":10,"gc":19,"seasons":[2017,2018,2019,2020,2021]},{"pc":"P058","name":"ศักดิ์สิทธิ์ จิตวิจารณ์","nick":"ไมค์","pos":"DF","apps":75,"starts":72,"subs":3,"g":7,"a":1,"gc":8,"seasons":[2016,2017,2018,2019,2020]},{"pc":"P034","name":"ภูษิต ศรีดอกพุฒ","nick":"เต้ย","pos":"DF","apps":73,"starts":66,"subs":7,"g":1,"a":4,"gc":5,"seasons":[2015,2016,2017,2018,2019,2020]},{"pc":"P045","name":"Hiroyuki Sugimoto","nick":"Sugi","pos":"FC","apps":71,"starts":64,"subs":7,"g":26,"a":14,"gc":40,"seasons":[2016,2017,2018]},{"pc":"P053","name":"พีรณัฐ ซื่อมาก","nick":"ฟีฟ่า","pos":"MF","apps":71,"starts":42,"subs":29,"g":3,"a":6,"gc":9,"seasons":[2016,2017,2018,2019,2020]},{"pc":"P103","name":"วรเดช บุญมาขจรกิจ","nick":"เซฟตี้","pos":"MF","apps":71,"starts":34,"subs":37,"g":9,"a":2,"gc":11,"seasons":[2021,2022,2023,2024,2025]},{"pc":"P098","name":"อะหมัด หีมเบญหมัด","nick":"หมัด","pos":"DF","apps":70,"starts":54,"subs":16,"g":4,"a":6,"gc":10,"seasons":[2020,2021,2022,2023,2024]},{"pc":"P129","name":"วัชรพงษ์ วันทอง","nick":"เนส","pos":"MF","apps":70,"starts":50,"subs":20,"g":13,"a":8,"gc":21,"seasons":[2022,2023,2024,2025]},{"pc":"P066","name":"พนมพร พวงมาลัย","nick":"เน็ตตี้","pos":"MF","apps":69,"starts":61,"subs":8,"g":4,"a":2,"gc":6,"seasons":[2017,2018,2019,2020,2021,2023]},{"pc":"P075","name":"ภีมปภพ วิริยะชาญชัย","nick":"อู๋","pos":"MF","apps":66,"starts":38,"subs":28,"g":7,"a":9,"gc":16,"seasons":[2018,2019,2020,2021]},{"pc":"P047","name":"วีระเทพ ป้อมพันธ์","nick":"เตอร์","pos":"MF","apps":64,"starts":59,"subs":5,"g":3,"a":13,"gc":16,"seasons":[2016,2017,2018]},{"pc":"P132","name":"ธนนนท์ นุชประมูล","nick":"ไกด์","pos":"DF","apps":62,"starts":48,"subs":14,"g":4,"a":6,"gc":10,"seasons":[2022,2023,2024,2025]}];
-
-const SD = [{"season":2015,"W":17,"D":5,"L":14,"gf":59,"ga":51,"pts":56,"n":36},{"season":2016,"W":13,"D":6,"L":3,"gf":45,"ga":22,"pts":45,"n":22},{"season":2017,"W":12,"D":6,"L":10,"gf":50,"ga":38,"pts":42,"n":28},{"season":2018,"W":14,"D":4,"L":8,"gf":55,"ga":32,"pts":46,"n":26},{"season":2019,"W":11,"D":5,"L":10,"gf":44,"ga":43,"pts":38,"n":26},{"season":2020,"W":9,"D":4,"L":9,"gf":38,"ga":34,"pts":31,"n":22},{"season":2021,"W":13,"D":6,"L":7,"gf":52,"ga":36,"pts":45,"n":26},{"season":2022,"W":10,"D":5,"L":7,"gf":43,"ga":35,"pts":35,"n":22},{"season":2023,"W":10,"D":4,"L":7,"gf":38,"ga":30,"pts":34,"n":21},{"season":2024,"W":11,"D":4,"L":7,"gf":42,"ga":32,"pts":37,"n":22},{"season":2025,"W":14,"D":3,"L":7,"gf":48,"ga":28,"pts":45,"n":24}];
-
-/* ── CHARTS ─────────────────────────────────────────────── */
 let charts = {};
-function mkChart(id,cfg){if(charts[id])charts[id].destroy();charts[id]=new Chart(document.getElementById(id),cfg);return charts[id]}
+function mkChart(id,cfg){if(charts[id])charts[id].destroy();charts[id]=new Chart(document.getElementById(id),cfg)}
 
-const GREEN='#3db87a',YELLOW='#f5c342',RED='#e85757',BLUE='#4f8ef7',PURPLE='#a78bfa';
-const gridOpts={color:'#ffffff0a'};
-const tickOpts={color:'#7a8299',font:{size:11}};
+const G='#34d399',Y='#fbbf24',R='#f87171',B='#60a5fa',P='#a78bfa';
+const gridC='#ffffff08',tickC='#7b879e';
+const baseOpts={responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:tickC,font:{size:11}},grid:{color:gridC}},y:{ticks:{color:tickC,font:{size:11}},grid:{color:gridC}}}};
 
-function filterTS(){
-  const s=document.getElementById('f-season').value;
-  const c=document.getElementById('f-comp').value;
-  const v=document.getElementById('f-venue').value;
-  return TS.filter(m=>(!s||m.season==s)&&(!c||m.competition==c)&&(!v||m.venue==v));
-}
+function pct(n,t){return t>0?Math.round(n/t*100):0}
+function wRate(p){return pct(p.total.W||0,p.total.apps)}
+function label(p){return p.nick||(p.name.length>10?p.name.slice(0,10)+'…':p.name)}
 
-function renderTeam(){
-  const data=filterTS();
-  const W=data.filter(m=>m.result=='W').length;
-  const D=data.filter(m=>m.result=='D').length;
-  const L=data.filter(m=>m.result=='L').length;
-  const gf=data.reduce((s,m)=>s+m.gf,0);
-  const ga=data.reduce((s,m)=>s+m.ga,0);
-  const pts=data.reduce((s,m)=>s+m.pts,0);
-
-  document.getElementById('team-metrics').innerHTML=`
-    <div class="metric"><div class="metric-label">นัดทั้งหมด</div><div class="metric-val blue">${data.length}</div></div>
-    <div class="metric"><div class="metric-label">ชนะ / เสมอ / แพ้</div><div class="metric-val" style="font-size:18px"><span style="color:${GREEN}">${W}</span> <span style="color:${YELLOW};font-size:14px">/ ${D} /</span> <span style="color:${RED}">${L}</span></div><div class="metric-sub">Win ${data.length?Math.round(W/data.length*100):0}%</div></div>
-    <div class="metric"><div class="metric-label">ประตูได้ / เสีย</div><div class="metric-val" style="font-size:20px"><span style="color:${GREEN}">${gf}</span> <span style="color:${RED};font-size:14px">/ ${ga}</span></div><div class="metric-sub">GD ${gf-ga>=0?'+':''}${gf-ga}</div></div>
-    <div class="metric"><div class="metric-label">แต้มรวม</div><div class="metric-val blue">${pts}</div><div class="metric-sub">${data.length?+(pts/data.length).toFixed(1):0} แต้ม/นัด</div></div>`;
-
-  // Season bar
-  const sd=SD.filter(s=>{
-    const comp=document.getElementById('f-comp').value;
-    const sv=document.getElementById('f-season').value;
-    return (!sv||s.season==sv);
+/* Populate dropdowns */
+function buildDropdowns(){
+  const s1=document.getElementById('sel-player');
+  const s2=document.getElementById('sel-compare');
+  const pos=document.getElementById('sel-pos').value;
+  const q=document.getElementById('search-input').value.toLowerCase();
+  const prev1=s1.value,prev2=s2.value;
+  while(s1.options.length>1)s1.remove(1);
+  while(s2.options.length>1)s2.remove(1);
+  let count=0;
+  RAW.forEach(p=>{
+    const match=(!pos||p.pos===pos)&&(!q||p.nick.toLowerCase().includes(q)||p.name.toLowerCase().includes(q)||p.pc.toLowerCase().includes(q));
+    if(!match)return;
+    count++;
+    const txt=`${label(p)} (${p.pos}) — ${p.total.apps}นัด`;
+    const o1=new Option(txt,p.pc); s1.append(o1);
+    const o2=new Option(txt,p.pc); s2.append(o2);
   });
-  mkChart('chart-season',{type:'bar',data:{labels:sd.map(s=>s.season),datasets:[{label:'ชนะ',data:sd.map(s=>s.W),backgroundColor:GREEN,borderRadius:2},{label:'เสมอ',data:sd.map(s=>s.D),backgroundColor:YELLOW,borderRadius:2},{label:'แพ้',data:sd.map(s=>s.L),backgroundColor:RED,borderRadius:2}]},options:{responsive:true,plugins:{legend:{labels:{color:'#7a8299',font:{size:11}}}},scales:{x:{stacked:true,ticks:tickOpts,grid:gridOpts},y:{stacked:true,ticks:tickOpts,grid:gridOpts}}}});
-
-  // Venue pie
-  const H=data.filter(m=>m.venue=='H').length,A=data.filter(m=>m.venue=='A').length;
-  mkChart('chart-venue',{type:'doughnut',data:{labels:['เหย้า','เยือน'],datasets:[{data:[H,A],backgroundColor:[BLUE,PURPLE],borderWidth:0}]},options:{responsive:true,cutout:'60%',plugins:{legend:{position:'bottom',labels:{color:'#7a8299',font:{size:11}}}}}});
-
-  // WDL donut
-  mkChart('chart-wdl',{type:'doughnut',data:{labels:['ชนะ','เสมอ','แพ้'],datasets:[{data:[W,D,L],backgroundColor:[GREEN,YELLOW,RED],borderWidth:0}]},options:{responsive:true,cutout:'60%',plugins:{legend:{position:'bottom',labels:{color:'#7a8299',font:{size:11}}}}}});
-
-  // Goals line
-  mkChart('chart-goals',{type:'bar',data:{labels:SD.map(s=>s.season),datasets:[{label:'ประตูได้',data:SD.map(s=>s.gf),backgroundColor:GREEN+'99',borderRadius:3},{label:'ประตูเสีย',data:SD.map(s=>s.ga),backgroundColor:RED+'99',borderRadius:3}]},options:{responsive:true,plugins:{legend:{labels:{color:'#7a8299',font:{size:11}}}},scales:{x:{ticks:tickOpts,grid:gridOpts},y:{ticks:tickOpts,grid:gridOpts}}}});
-
-  renderMatchTable();
+  /* restore selections */
+  if([...s1.options].some(o=>o.value===prev1))s1.value=prev1;
+  if([...s2.options].some(o=>o.value===prev2))s2.value=prev2;
+  document.getElementById('result-count').textContent=`${count} นักเตะ`;
 }
 
-function renderMatchTable(){
-  const data=filterTS();
-  const q=document.getElementById('match-search').value.toLowerCase();
-  const r=document.getElementById('f-result').value;
-  const filtered=data.filter(m=>(!q||m.opponent.toLowerCase().includes(q)||m.match_id.toLowerCase().includes(q))&&(!r||m.result==r));
-  const sorted=[...filtered].sort((a,b)=>b.date.localeCompare(a.date));
-  document.getElementById('match-tbody').innerHTML=sorted.slice(0,50).map(m=>`
-    <tr>
-      <td style="color:var(--muted)">${m.date}</td>
-      <td style="font-family:monospace;font-size:12px">${m.match_id}</td>
-      <td>${m.opponent}</td>
-      <td><span class="badge badge-${m.venue}">${m.venue=='H'?'เหย้า':'เยือน'}</span></td>
-      <td class="num">${m.gf}</td>
-      <td class="num">${m.ga}</td>
-      <td><span class="badge badge-${m.result}">${m.result=='W'?'ชนะ':m.result=='D'?'เสมอ':'แพ้'}</span></td>
-      <td class="num">${m.pts}</td>
-    </tr>`).join('');
-  document.getElementById('match-count').textContent=`แสดง ${Math.min(50,filtered.length)} จาก ${filtered.length} นัด`;
+function filterPlayerList(){buildDropdowns();render()}
+function onPlayerChange(){document.getElementById('sel-compare').value='';render()}
+function clearAll(){
+  document.getElementById('sel-player').value='';
+  document.getElementById('sel-compare').value='';
+  document.getElementById('sel-pos').value='';
+  document.getElementById('search-input').value='';
+  buildDropdowns();render();
 }
 
-function filterPA(){
-  const pos=document.getElementById('fp-pos').value;
-  const sea=document.getElementById('fp-season').value;
-  const q=document.getElementById('player-search').value.toLowerCase();
-  return PA.filter(p=>(!pos||p.pos==pos)&&(!sea||p.seasons.includes(+sea))&&(!q||p.nick.includes(q)||p.name.includes(q)||p.pc.toLowerCase().includes(q)));
+buildDropdowns();
+
+/* ── RENDER ── */
+function render(){
+  const pc1=document.getElementById('sel-player').value;
+  const pc2=document.getElementById('sel-compare').value;
+  const wrap=document.getElementById('main-wrap');
+  if(!pc1){wrap.innerHTML='<div class="empty"><h2>เลือกนักเตะ</h2><p>เลือกชื่อจาก dropdown ด้านบน หรือพิมพ์ค้นหาได้เลย</p></div>';return}
+  const p=RAW.find(x=>x.pc===pc1);
+  if(!p)return;
+  const p2=pc2?RAW.find(x=>x.pc===pc2):null;
+  wrap.innerHTML=buildHTML(p,p2);
+  nextTick(()=>{drawCharts(p,p2)});
 }
 
-function renderPlayer(){
-  const data=filterPA();
-  const sort=document.getElementById('fp-sort').value;
-  const sorted=[...data].sort((a,b)=>b[sort]-a[sort]);
+function nextTick(fn){requestAnimationFrame(fn)}
 
-  const totalApps=data.reduce((s,p)=>s+p.apps,0);
-  const totalG=data.reduce((s,p)=>s+p.g,0);
-  const totalA=data.reduce((s,p)=>s+p.a,0);
+function buildHTML(p,p2){
+  const t=p.total;
+  const gc=t.g+t.a;
+  const wr=wRate(p);
+  const startRate=pct(t.starts,t.apps);
+  let html='';
 
-  document.getElementById('player-metrics').innerHTML=`
-    <div class="metric"><div class="metric-label">นักเตะ</div><div class="metric-val blue">${data.length}</div></div>
-    <div class="metric"><div class="metric-label">การลงสนามรวม</div><div class="metric-val">${totalApps}</div></div>
-    <div class="metric"><div class="metric-label">ประตูรวม</div><div class="metric-val green">${totalG}</div></div>
-    <div class="metric"><div class="metric-label">แอสซิสต์รวม</div><div class="metric-val" style="color:${BLUE}">${totalA}</div></div>`;
+  /* Player header */
+  html+=`<div class="player-header">
+    <div class="avatar ${p.pos}">${p.pos}</div>
+    <div class="player-info">
+      <h1>${p.nick||p.name} <span style="font-size:14px;font-weight:400;color:var(--muted)">${p.name}</span></h1>
+      <p><span class="pos-badge ${p.pos}">${p.pos}</span><span class="seasons-list">เล่นซีซัน: ${p.seasons.join(', ')}</span></p>
+    </div>
+  </div>`;
 
-  // Top apps
-  const top10a=sorted.slice(0,10);
-  mkChart('chart-top-apps',{type:'bar',data:{labels:top10a.map(p=>p.nick),datasets:[{label:'ตัวจริง',data:top10a.map(p=>p.starts),backgroundColor:GREEN,borderRadius:3},{label:'สำรอง',data:top10a.map(p=>p.subs),backgroundColor:BLUE+'88',borderRadius:3}]},options:{indexAxis:'y',responsive:true,plugins:{legend:{labels:{color:'#7a8299',font:{size:11}}}},scales:{x:{stacked:true,ticks:tickOpts,grid:gridOpts},y:{stacked:true,ticks:{...tickOpts,font:{size:12}},grid:{display:false}}}}});
+  /* Metric cards */
+  html+=`<div class="metrics">
+    <div class="metric"><div class="metric-lbl">นัดทั้งหมด</div><div class="metric-val" style="color:var(--blue)">${t.apps}</div></div>
+    <div class="metric"><div class="metric-lbl">ตัวจริง</div><div class="metric-val" style="color:var(--green)">${t.starts}</div><div class="metric-sub">${startRate}% ของนัดที่ลง</div></div>
+    <div class="metric"><div class="metric-lbl">ตัวสำรอง</div><div class="metric-val" style="color:var(--purple)">${t.subs}</div><div class="metric-sub">${100-startRate}%</div></div>
+    <div class="metric"><div class="metric-lbl">ประตู</div><div class="metric-val" style="color:var(--green)">${t.g}</div><div class="metric-sub">${t.apps>0?(t.g/t.apps).toFixed(2):0}/นัด</div></div>
+    <div class="metric"><div class="metric-lbl">แอสซิสต์</div><div class="metric-val" style="color:var(--yellow)">${t.a}</div><div class="metric-sub">${t.apps>0?(t.a/t.apps).toFixed(2):0}/นัด</div></div>
+    <div class="metric"><div class="metric-lbl">G+A</div><div class="metric-val">${gc}</div><div class="metric-sub">${t.apps>0?(gc/t.apps).toFixed(2):0}/นัด</div></div>
+  </div>`;
 
-  // Top GC
-  const top10gc=[...data].sort((a,b)=>b.gc-a.gc).slice(0,10);
-  mkChart('chart-top-gc',{type:'bar',data:{labels:top10gc.map(p=>p.nick),datasets:[{label:'ประตู',data:top10gc.map(p=>p.g),backgroundColor:GREEN,borderRadius:3},{label:'แอสซิสต์',data:top10gc.map(p=>p.a),backgroundColor:YELLOW,borderRadius:3}]},options:{indexAxis:'y',responsive:true,plugins:{legend:{labels:{color:'#7a8299',font:{size:11}}}},scales:{x:{stacked:true,ticks:tickOpts,grid:gridOpts},y:{stacked:true,ticks:{...tickOpts,font:{size:12}},grid:{display:false}}}}});
+  /* Row 1: Appearances chart + Win ratio + Stats */
+  html+=`<div class="grid-3">
+    <div class="card">
+      <div class="card-title">appearances รายซีซัน</div>
+      <div style="position:relative;height:180px"><canvas id="ch-apps"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-title">win ratio เมื่อลงสนาม</div>
+      <div class="ratio-box"><div class="ratio-big" style="color:${wr>=50?'var(--green)':'var(--red)'}">${wr}%</div><div class="ratio-lbl">win rate (${t.W}W ${t.D}D ${t.L}L)</div></div>
+      <div class="wdl-row"><span class="wdl-label">ชนะ</span><div class="wdl-bar-wrap"><div class="wdl-bar" style="width:${pct(t.W,t.apps)}%;background:var(--green)"></div></div><span class="wdl-val" style="color:var(--green)">${t.W}</span></div>
+      <div class="wdl-row"><span class="wdl-label">เสมอ</span><div class="wdl-bar-wrap"><div class="wdl-bar" style="width:${pct(t.D,t.apps)}%;background:var(--yellow)"></div></div><span class="wdl-val" style="color:var(--yellow)">${t.D}</span></div>
+      <div class="wdl-row"><span class="wdl-label">แพ้</span><div class="wdl-bar-wrap"><div class="wdl-bar" style="width:${pct(t.L,t.apps)}%;background:var(--red)"></div></div><span class="wdl-val" style="color:var(--red)">${t.L}</span></div>
+    </div>
+    <div class="card">
+      <div class="card-title">สถิติรวม</div>
+      ${statRow('ลงสนาม',t.apps,' นัด')}
+      ${statRow('ตัวจริง',t.starts,` (${startRate}%)`)}
+      ${statRow('ตัวสำรอง',t.subs,'')}
+      ${statRow('ประตู',t.g,'',G)}
+      ${statRow('แอสซิสต์',t.a,'',Y)}
+      ${statRow('G+A',gc,'')}
+    </div>
+  </div>`;
 
-  // Position
-  const posCnt={GK:0,DF:0,MF:0,FC:0};
-  data.forEach(p=>posCnt[p.pos]=(posCnt[p.pos]||0)+1);
-  mkChart('chart-pos',{type:'doughnut',data:{labels:['GK','DF','MF','FC'],datasets:[{data:[posCnt.GK,posCnt.DF,posCnt.MF,posCnt.FC],backgroundColor:[BLUE,GREEN,YELLOW,RED],borderWidth:0}]},options:{responsive:true,cutout:'55%',plugins:{legend:{position:'bottom',labels:{color:'#7a8299',font:{size:11}}}}}});
+  /* Row 2: Goals+Assists per season + Starter/Sub win rate */
+  html+=`<div class="grid-2">
+    <div class="card">
+      <div class="card-title">ประตู + แอสซิสต์ รายซีซัน</div>
+      <div style="position:relative;height:180px"><canvas id="ch-ga"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-title">win rate — ตัวจริง vs สำรอง</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+        <div style="text-align:center">
+          <div style="font-size:11px;color:var(--muted);margin-bottom:4px">เมื่อเล่นตัวจริง</div>
+          <div style="font-size:28px;font-weight:600;color:${pct(p.as_starter.W||0,(p.as_starter.W||0)+(p.as_starter.D||0)+(p.as_starter.L||0))>=50?'var(--green)':'var(--red)'}">${pct(p.as_starter.W||0,(p.as_starter.W||0)+(p.as_starter.D||0)+(p.as_starter.L||0))}%</div>
+          <div style="font-size:11px;color:var(--hint)">${p.as_starter.W||0}W ${p.as_starter.D||0}D ${p.as_starter.L||0}L</div>
+        </div>
+        <div style="text-align:center">
+          <div style="font-size:11px;color:var(--muted);margin-bottom:4px">เมื่อเล่นตัวสำรอง</div>
+          <div style="font-size:28px;font-weight:600;color:${pct(p.as_sub.W||0,(p.as_sub.W||0)+(p.as_sub.D||0)+(p.as_sub.L||0))>=50?'var(--green)':'var(--red)'}">${pct(p.as_sub.W||0,(p.as_sub.W||0)+(p.as_sub.D||0)+(p.as_sub.L||0))}%</div>
+          <div style="font-size:11px;color:var(--hint)">${p.as_sub.W||0}W ${p.as_sub.D||0}D ${p.as_sub.L||0}L</div>
+        </div>
+      </div>
+      <div style="position:relative;height:90px"><canvas id="ch-apptype"></canvas></div>
+    </div>
+  </div>`;
 
-  // Starter/Sub
-  const starts=data.reduce((s,p)=>s+p.starts,0);
-  const subs=data.reduce((s,p)=>s+p.subs,0);
-  mkChart('chart-app-type',{type:'doughnut',data:{labels:['ตัวจริง','สำรอง'],datasets:[{data:[starts,subs],backgroundColor:[GREEN,BLUE],borderWidth:0}]},options:{responsive:true,cutout:'55%',plugins:{legend:{position:'bottom',labels:{color:'#7a8299',font:{size:11}}}}}});
+  /* Row 3: League vs Cup */
+  const comps=Object.keys(p.by_comp);
+  if(comps.length>0){
+    html+=`<div class="card" style="margin-bottom:14px">
+      <div class="card-title">League vs Cup</div>
+      <div style="display:grid;grid-template-columns:repeat(${comps.length},1fr);gap:14px">
+        ${comps.map(c=>{const d=p.by_comp[c];const gc2=d.g+d.a;return`
+          <div>
+            <div style="font-size:13px;font-weight:500;margin-bottom:8px;color:${c==='League'?'var(--blue)':'var(--purple)'}">${c}</div>
+            ${statRow('นัด',d.apps,'')}
+            ${statRow('ตัวจริง',d.starts,'')}
+            ${statRow('สำรอง',d.subs,'')}
+            ${statRow('ประตู',d.g,'',G)}
+            ${statRow('แอสซิสต์',d.a,'',Y)}
+            ${statRow('G+A',gc2,'')}
+            <div style="margin-top:8px;display:flex;gap:8px;font-size:12px">
+              <span style="color:var(--green)">W ${d.W||0}</span>
+              <span style="color:var(--yellow)">D ${d.D||0}</span>
+              <span style="color:var(--red)">L ${d.L||0}</span>
+            </div>
+          </div>`}).join('<div style="border-left:1px solid var(--bord);margin:0 6px"></div>')}
+      </div>
+    </div>`;
+  }
 
-  // Table
-  document.getElementById('player-tbody').innerHTML=sorted.map((p,i)=>`
-    <tr>
-      <td style="color:var(--muted)">${i+1}</td>
-      <td><strong>${p.nick}</strong></td>
-      <td style="color:var(--muted);font-size:12px">${p.name}</td>
-      <td><span class="badge-pos">${p.pos}</span></td>
-      <td class="num">${p.apps}</td>
-      <td class="num" style="color:${GREEN}">${p.starts}</td>
-      <td class="num" style="color:${BLUE}">${p.subs}</td>
-      <td class="num">${p.g>0?`<strong style="color:${GREEN}">${p.g}</strong>`:0}</td>
-      <td class="num">${p.a>0?`<strong style="color:${YELLOW}">${p.a}</strong>`:0}</td>
-      <td class="num">${p.gc>0?`<strong>${p.gc}</strong>`:0}</td>
-    </tr>`).join('');
-  document.getElementById('player-count').textContent=`แสดง ${sorted.length} นักเตะ`;
+  /* Comparison */
+  if(p2){
+    html+=`<div class="card" style="margin-bottom:14px">
+      <div class="card-title">เปรียบเทียบ ${label(p)} vs ${label(p2)}</div>
+      <div style="position:relative;height:180px;margin-bottom:14px"><canvas id="ch-compare"></canvas></div>
+      <div class="compare-grid">
+        ${cmpBlock(p,p2,'นัด','apps')}
+        ${cmpBlock(p,p2,'ตัวจริง','starts')}
+        ${cmpBlock(p,p2,'สำรอง','subs')}
+        ${cmpBlock(p,p2,'ประตู','g')}
+        ${cmpBlock(p,p2,'แอสซิสต์','a')}
+        ${cmpBlock(p,p2,'Win %',null,'wr')}
+      </div>
+    </div>`;
+  }
+
+  return html;
 }
 
-/* ── INIT ────────────────────────────────────────────────── */
-function showPage(id){
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
-  document.getElementById('page-'+id).classList.add('active');
-  event.target.classList.add('active');
-  if(id==='team') renderTeam(); else renderPlayer();
+function statRow(name,val,sub='',color=''){
+  return`<div class="stat-row"><span class="stat-name">${name}</span><span class="stat-value"${color?` style="color:${color}"`:''}}>${val}${sub}</span></div>`;
+}
+function cmpBlock(p1,p2,label,key,special){
+  let v1,v2;
+  if(special==='wr'){v1=wRate(p1);v2=wRate(p2);return`<div><div class="compare-row"><div class="compare-cell ${v1>v2?'winner':''}">${label(p1)}: <b>${v1}%</b></div><div class="compare-cell mid">${label}</div><div class="compare-cell ${v2>v1?'winner':''}" style="text-align:right"><b>${v2}%</b> :${label(p2)}</div></div></div>`;}
+  v1=p1.total[key]||0;v2=p2.total[key]||0;
+  return`<div><div class="compare-row"><div class="compare-cell ${v1>v2?'winner':''}">${labelP(p1)}: <b>${v1}</b></div><div class="compare-cell mid">${label}</div><div class="compare-cell ${v2>v1?'winner':''}" style="text-align:right"><b>${v2}</b> :${labelP(p2)}</div></div></div>`;
+}
+function labelP(p){return p.nick||(p.name.length>8?p.name.slice(0,8)+'…':p.name)}
+
+function drawCharts(p,p2){
+  const seasons=Object.keys(p.by_season).sort();
+  const sd=seasons.map(s=>p.by_season[s]);
+
+  /* Appearances stacked bar */
+  mkChart('ch-apps',{type:'bar',data:{
+    labels:seasons,
+    datasets:[
+      {label:'ตัวจริง',data:sd.map(d=>d.starts),backgroundColor:G+'cc',borderRadius:3},
+      {label:'สำรอง',data:sd.map(d=>d.subs),backgroundColor:B+'88',borderRadius:3}
+    ]
+  },options:{...baseOpts,plugins:{legend:{display:true,labels:{color:tickC,font:{size:11}}}},scales:{x:{...baseOpts.scales.x,stacked:true},y:{...baseOpts.scales.y,stacked:true}}}});
+
+  /* Goals+Assists per season */
+  mkChart('ch-ga',{type:'bar',data:{
+    labels:seasons,
+    datasets:[
+      {label:'ประตู',data:sd.map(d=>d.g),backgroundColor:G+'cc',borderRadius:3},
+      {label:'แอสซิสต์',data:sd.map(d=>d.a),backgroundColor:Y+'88',borderRadius:3}
+    ]
+  },options:{...baseOpts,plugins:{legend:{display:true,labels:{color:tickC,font:{size:11}}}},scales:{x:{...baseOpts.scales.x,stacked:true},y:{...baseOpts.scales.y,stacked:true}}}});
+
+  /* Starter vs Sub chart */
+  const st=p.as_starter,su=p.as_sub;
+  mkChart('ch-apptype',{type:'bar',data:{
+    labels:['ตัวจริง','สำรอง'],
+    datasets:[
+      {label:'ชนะ',data:[st.W||0,su.W||0],backgroundColor:G},
+      {label:'เสมอ',data:[st.D||0,su.D||0],backgroundColor:Y},
+      {label:'แพ้',data:[st.L||0,su.L||0],backgroundColor:R}
+    ]
+  },options:{...baseOpts,plugins:{legend:{display:false}},scales:{x:{...baseOpts.scales.x,stacked:true},y:{...baseOpts.scales.y,stacked:true}}}});
+
+  /* Comparison radar */
+  if(p2&&document.getElementById('ch-compare')){
+    const cats=['นัด','ประตู','แอสซิสต์','G+A','Win%'];
+    const maxA=Math.max(p.total.apps,p2.total.apps)||1;
+    const maxG=Math.max(p.total.g,p2.total.g)||1;
+    const maxAst=Math.max(p.total.a,p2.total.a)||1;
+    const maxGC=Math.max(p.total.g+p.total.a,p2.total.g+p2.total.a)||1;
+    function norm(p3){return[
+      Math.round(p3.total.apps/maxA*100),
+      Math.round(p3.total.g/maxG*100),
+      Math.round(p3.total.a/maxAst*100),
+      Math.round((p3.total.g+p3.total.a)/maxGC*100),
+      wRate(p3)
+    ]}
+    mkChart('ch-compare',{type:'radar',data:{
+      labels:cats,
+      datasets:[
+        {label:label(p),data:norm(p),borderColor:B,backgroundColor:B+'22',pointBackgroundColor:B},
+        {label:label(p2),data:norm(p2),borderColor:P,backgroundColor:P+'22',pointBackgroundColor:P}
+      ]
+    },options:{responsive:true,maintainAspectRatio:false,scales:{r:{ticks:{color:tickC,font:{size:10},backdropColor:'transparent'},grid:{color:'#ffffff12'},pointLabels:{color:tickC,font:{size:11}}}},plugins:{legend:{labels:{color:tickC,font:{size:11}}}}}});
+  }
 }
 
-// Populate season dropdowns
-const seasons=[...new Set(TS.map(m=>m.season))].sort();
-seasons.forEach(s=>{
-  ['f-season','fp-season'].forEach(id=>{
-    const el=document.getElementById(id);
-    if(el){const o=document.createElement('option');o.value=s;o.textContent=s;el.appendChild(o);}
-  });
-});
-
-renderTeam();
+/* Initial render if URL has player param */
+const params=new URLSearchParams(location.search);
+if(params.get('p')){
+  document.getElementById('sel-player').value=params.get('p');
+  render();
+}
 </script>
 </body>
 </html>
