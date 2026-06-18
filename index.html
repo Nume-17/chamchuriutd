@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Chamchuri United — Dashboard</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0d0f14;--surface:#161a22;--card:#1c2130;--border:#ffffff12;
+  --text:#f0f2f7;--muted:#7a8299;--accent:#4f8ef7;
+  --green:#3db87a;--yellow:#f5c342;--red:#e85757;
+  --green-bg:#1a3328;--yellow-bg:#332d14;--red-bg:#321a1a;
+}
+body{background:var(--bg);color:var(--text);font-family:'Sarabun',sans-serif;font-size:14px;min-height:100vh}
+@import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600&display=swap');
+
+/* NAV */
+nav{background:var(--surface);border-bottom:1px solid var(--border);padding:0 24px;display:flex;align-items:center;gap:0;height:52px;position:sticky;top:0;z-index:100}
+.nav-logo{font-size:15px;font-weight:600;color:var(--text);margin-right:32px;white-space:nowrap}
+.nav-logo span{color:var(--accent)}
+.nav-tabs{display:flex;gap:4px}
+.nav-tab{padding:6px 16px;border-radius:6px;cursor:pointer;font-size:13px;color:var(--muted);border:none;background:none;transition:all .15s}
+.nav-tab:hover{color:var(--text);background:var(--card)}
+.nav-tab.active{color:var(--text);background:var(--card);font-weight:500}
+.nav-right{margin-left:auto;font-size:12px;color:var(--muted)}
+
+/* LAYOUT */
+.page{display:none;padding:24px;max-width:1200px;margin:0 auto}
+.page.active{display:block}
+
+/* FILTER BAR */
+.filters{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px;align-items:center}
+.filters label{font-size:12px;color:var(--muted)}
+select{background:var(--card);border:1px solid var(--border);color:var(--text);padding:6px 10px;border-radius:6px;font-size:13px;font-family:'Sarabun',sans-serif;cursor:pointer}
+select:focus{outline:none;border-color:var(--accent)}
+
+/* METRIC CARDS */
+.metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:20px}
+.metric{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px}
+.metric-label{font-size:11px;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:.04em}
+.metric-val{font-size:26px;font-weight:600;line-height:1}
+.metric-sub{font-size:11px;color:var(--muted);margin-top:4px}
+.metric-val.green{color:var(--green)}
+.metric-val.yellow{color:var(--yellow)}
+.metric-val.red{color:var(--red)}
+.metric-val.blue{color:var(--accent)}
+
+/* GRID */
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+.grid-3{display:grid;grid-template-columns:2fr 1fr 1fr;gap:16px;margin-bottom:16px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px}
+.card-title{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:14px}
+canvas{display:block;width:100%!important}
+
+/* TABLE */
+.tbl-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;padding:8px 10px;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.04em;border-bottom:1px solid var(--border);font-weight:500}
+td{padding:8px 10px;border-bottom:1px solid var(--border)8;color:var(--text)}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#ffffff04}
+.badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:500}
+.badge-W{background:var(--green-bg);color:var(--green)}
+.badge-D{background:var(--yellow-bg);color:var(--yellow)}
+.badge-L{background:var(--red-bg);color:var(--red)}
+.badge-H{background:#1a2a44;color:var(--accent)}
+.badge-A{background:#2a1a2a;color:#c084fc}
+.badge-pos{font-size:11px;color:var(--muted)}
+.num{text-align:right;font-family:monospace}
+
+/* SEARCH */
+input[type=text]{background:var(--card);border:1px solid var(--border);color:var(--text);padding:6px 12px;border-radius:6px;font-size:13px;font-family:'Sarabun',sans-serif;width:200px}
+input[type=text]::placeholder{color:var(--muted)}
+input[type=text]:focus{outline:none;border-color:var(--accent)}
+
+/* SPARKLINE row */
+.season-row{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border)}
+.season-row:last-child{border-bottom:none}
+.season-label{width:44px;font-size:12px;color:var(--muted);flex-shrink:0}
+.season-bars{display:flex;gap:2px;flex:1;align-items:flex-end;height:20px}
+.bar-w{background:var(--green);border-radius:2px 2px 0 0}
+.bar-d{background:var(--yellow);border-radius:2px 2px 0 0}
+.bar-l{background:var(--red);border-radius:2px 2px 0 0}
+.season-pts{width:36px;text-align:right;font-size:12px;color:var(--text);flex-shrink:0}
+
+/* RESPONSIVE */
+@media(max-width:700px){
+  .metrics{grid-template-columns:repeat(2,1fr)}
+  .grid-2,.grid-3{grid-template-columns:1fr}
+  nav{padding:0 12px}
+  .page{padding:12px}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">⚽ <span>Chamchuri</span> United</div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="showPage('team')">ทีม</button>
+    <button class="nav-tab" onclick="showPage('player')">นักเตะ</button>
+  </div>
+  <div class="nav-right">ข้อมูล 2015–2025</div>
+</nav>
+
+<!-- ══════════════════════ TEAM PAGE ══════════════════════ -->
+<div class="page active" id="page-team">
+  <div class="filters">
+    <label>ซีซัน</label>
+    <select id="f-season" onchange="renderTeam()">
+      <option value="">ทั้งหมด</option>
+    </select>
+    <label>ประเภท</label>
+    <select id="f-comp" onchange="renderTeam()">
+      <option value="">ทั้งหมด</option>
+      <option value="League">League</option>
+      <option value="Cup">Cup</option>
+    </select>
+    <label>สนาม</label>
+    <select id="f-venue" onchange="renderTeam()">
+      <option value="">ทั้งหมด</option>
+      <option value="H">เหย้า</option>
+      <option value="A">เยือน</option>
+    </select>
+  </div>
+
+  <div class="metrics" id="team-metrics"></div>
+
+  <div class="grid-3">
+    <div class="card">
+      <div class="card-title">ผลแพ้ชนะรายซีซัน</div>
+      <canvas id="chart-season" height="200"></canvas>
+    </div>
+    <div class="card">
+      <div class="card-title">เหย้า vs เยือน</div>
+      <canvas id="chart-venue" height="200"></canvas>
+    </div>
+    <div class="card">
+      <div class="card-title">W/D/L รวม</div>
+      <canvas id="chart-wdl" height="200"></canvas>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:16px">
+    <div class="card-title">ประตูได้ vs ประตูเสีย รายซีซัน</div>
+    <canvas id="chart-goals" height="120"></canvas>
+  </div>
+
+  <div class="card">
+    <div class="card-title">ผลการแข่งขัน</div>
+    <div style="margin-bottom:10px;display:flex;gap:8px">
+      <input type="text" id="match-search" placeholder="ค้นหาทีม..." oninput="renderMatchTable()">
+      <select id="f-result" onchange="renderMatchTable()" style="width:auto">
+        <option value="">ผลทั้งหมด</option>
+        <option value="W">ชนะ</option>
+        <option value="D">เสมอ</option>
+        <option value="L">แพ้</option>
+      </select>
+    </div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr>
+          <th>วันที่</th><th>นัด</th><th>คู่แข่ง</th><th>สนาม</th>
+          <th class="num">GF</th><th class="num">GA</th><th>ผล</th><th class="num">แต้ม</th>
+        </tr></thead>
+        <tbody id="match-tbody"></tbody>
+      </table>
+    </div>
+    <div id="match-count" style="font-size:11px;color:var(--muted);margin-top:8px;text-align:right"></div>
+  </div>
+</div>
+
+<!-- ══════════════════════ PLAYER PAGE ══════════════════════ -->
+<div class="page" id="page-player">
+  <div class="filters">
+    <label>ตำแหน่ง</label>
+    <select id="fp-pos" onchange="renderPlayer()">
+      <option value="">ทั้งหมด</option>
+      <option value="GK">GK</option>
+      <option value="DF">DF</option>
+      <option value="MF">MF</option>
+      <option value="FC">FC</option>
+    </select>
+    <label>ซีซัน</label>
+    <select id="fp-season" onchange="renderPlayer()">
+      <option value="">ทั้งหมด</option>
+    </select>
+    <label>เรียงตาม</label>
+    <select id="fp-sort" onchange="renderPlayer()">
+      <option value="apps">นัดที่ลง</option>
+      <option value="g">ประตู</option>
+      <option value="a">แอสซิสต์</option>
+      <option value="gc">Goal Contributions</option>
+    </select>
+    <input type="text" id="player-search" placeholder="ค้นหานักเตะ..." oninput="renderPlayer()" style="margin-left:auto">
+  </div>
+
+  <div class="metrics" id="player-metrics"></div>
+
+  <div class="grid-2" style="margin-bottom:16px">
+    <div class="card">
+      <div class="card-title">Top 10 — นัดที่ลงสนาม</div>
+      <canvas id="chart-top-apps" height="220"></canvas>
+    </div>
+    <div class="card">
+      <div class="card-title">Top 10 — ประตู + แอสซิสต์</div>
+      <canvas id="chart-top-gc" height="220"></canvas>
+    </div>
+  </div>
+
+  <div class="grid-2" style="margin-bottom:16px">
+    <div class="card">
+      <div class="card-title">สัดส่วนตำแหน่ง</div>
+      <canvas id="chart-pos" height="180"></canvas>
+    </div>
+    <div class="card">
+      <div class="card-title">Starter vs Sub</div>
+      <canvas id="chart-app-type" height="180"></canvas>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">สถิตินักเตะ</div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr>
+          <th>#</th><th>ชื่อเล่น</th><th>ชื่อจริง</th><th>ตำแหน่ง</th>
+          <th class="num">นัด</th><th class="num">ตัวจริง</th><th class="num">สำรอง</th>
+          <th class="num">ประตู</th><th class="num">แอสซิสต์</th><th class="num">G+A</th>
+        </tr></thead>
+        <tbody id="player-tbody"></tbody>
+      </table>
+    </div>
+    <div id="player-count" style="font-size:11px;color:var(--muted);margin-top:8px;text-align:right"></div>
+  </div>
+</div>
+
+<script>
+/* ── DATA ─────────────────────────────────────────────────── */
+const TS = [{"match_id":"S15-01","season":2015,"competition":"League","stage":"League","date":"2015-02-15","venue":"A","opponent":"Army FC","result":"L","gf":1,"ga":3,"pts":0,"stype":"League"},{"match_id":"S15-02","season":2015,"competition":"League","stage":"League","date":"2015-03-01","venue":"H","opponent":"Rangsit FC","result":"W","gf":3,"ga":0,"pts":3,"stype":"League"},{"match_id":"S15-03","season":2015,"competition":"League","stage":"League","date":"2015-03-08","venue":"A","opponent":"North Bangkok","result":"D","gf":1,"ga":1,"pts":1,"stype":"League"},{"match_id":"S15-04","season":2015,"competition":"League","stage":"League","date":"2015-03-15","venue":"H","opponent":"ABAC FC","result":"W","gf":4,"ga":1,"pts":3,"stype":"League"},{"match_id":"S15-05","season":2015,"competition":"League","stage":"League","date":"2015-03-22","venue":"A","opponent":"Rajamangala","result":"W","gf":2,"ga":1,"pts":3,"stype":"League"},{"match_id":"S15-06","season":2015,"competition":"League","stage":"League","date":"2015-03-29","venue":"H","opponent":"Army FC","result":"L","gf":0,"ga":2,"pts":0,"stype":"League"},{"match_id":"S15-07","season":2015,"competition":"League","stage":"League","date":"2015-04-05","venue":"A","opponent":"Rangsit FC","result":"W","gf":2,"ga":0,"pts":3,"stype":"League"},{"match_id":"S15-08","season":2015,"competition":"League","stage":"League","date":"2015-04-12","venue":"H","opponent":"North Bangkok","result":"W","gf":3,"ga":1,"pts":3,"stype":"League"},{"match_id":"S15-09","season":2015,"competition":"League","stage":"League","date":"2015-04-19","venue":"A","opponent":"ABAC FC","result":"D","gf":2,"ga":2,"pts":1,"stype":"League"},{"match_id":"S15-10","season":2015,"competition":"League","stage":"League","date":"2015-04-26","venue":"H","opponent":"Rajamangala","result":"W","gf":1,"ga":0,"pts":3,"stype":"League"},{"match_id":"S15-11","season":2015,"competition":"League","stage":"League","date":"2015-05-03","venue":"A","opponent":"KU FC","result":"L","gf":1,"ga":3,"pts":0,"stype":"League"},{"match_id":"S15-12","season":2015,"competition":"League","stage":"League","date":"2015-05-10","venue":"H","opponent":"Assumption FC","result":"W","gf":5,"ga":2,"pts":3,"stype":"League"},{"match_id":"S15-13","season":2015,"competition":"League","stage":"League","date":"2015-05-17","venue":"A","opponent":"Thammasat FC","result":"L","gf":0,"ga":1,"pts":0,"stype":"League"},{"match_id":"S15-14","season":2015,"competition":"League","stage":"League","date":"2015-05-24","venue":"H","opponent":"KU FC","result":"W","gf":2,"ga":1,"pts":3,"stype":"League"},{"match_id":"S15-15","season":2015,"competition":"League","stage":"League","date":"2015-05-31","venue":"A","opponent":"Assumption FC","result":"L","gf":1,"ga":2,"pts":0,"stype":"League"},{"match_id":"S15-16","season":2015,"competition":"League","stage":"League","date":"2015-06-07","venue":"H","opponent":"Thammasat FC","result":"W","gf":3,"ga":0,"pts":3,"stype":"League"},{"match_id":"S15-17","season":2015,"competition":"League","stage":"League","date":"2015-06-14","venue":"A","opponent":"Silpakorn FC","result":"W","gf":2,"ga":1,"pts":3,"stype":"League"},{"match_id":"S15-18","season":2015,"competition":"League","stage":"League","date":"2015-06-21","venue":"H","opponent":"Mahidol FC","result":"D","gf":1,"ga":1,"pts":1,"stype":"League"},{"match_id":"S15-19","season":2015,"competition":"League","stage":"League","date":"2015-07-05","venue":"A","opponent":"Mahidol FC","result":"L","gf":0,"ga":1,"pts":0,"stype":"League"},{"match_id":"S15-20","season":2015,"competition":"League","stage":"League","date":"2015-07-12","venue":"H","opponent":"Silpakorn FC","result":"W","gf":2,"ga":0,"pts":3,"stype":"League"},{"match_id":"S15-21","season":2015,"competition":"League","stage":"League","date":"2015-07-19","venue":"A","opponent":"Army FC","result":"L","gf":1,"ga":4,"pts":0,"stype":"League"},{"match_id":"S15-22","season":2015,"competition":"League","stage":"League","date":"2015-07-26","venue":"H","opponent":"KU FC","result":"W","gf":3,"ga":2,"pts":3,"stype":"League"},{"match_id":"S15-23","season":2015,"competition":"League","stage":"League","date":"2015-08-09","venue":"A","opponent":"North Bangkok","result":"L","gf":0,"ga":1,"pts":0,"stype":"League"},{"match_id":"S15-24","season":2015,"competition":"League","stage":"League","date":"2015-08-16","venue":"H","opponent":"ABAC FC","result":"W","gf":4,"ga":0,"pts":3,"stype":"League"},{"match_id":"S15-25","season":2015,"competition":"League","stage":"League","date":"2015-08-23","venue":"A","opponent":"Rajamangala","result":"L","gf":2,"ga":3,"pts":0,"stype":"League"},{"match_id":"S15-26","season":2015,"competition":"League","stage":"League","date":"2015-09-26","venue":"H","opponent":"Army FC","result":"D","gf":2,"ga":2,"pts":1,"stype":"League"},{"match_id":"s15-P1","season":2015,"competition":"League","stage":"Playoff","date":"2015-10-11","venue":"H","opponent":"North Bangkok","result":"W","gf":3,"ga":1,"pts":3,"stype":"League"},{"match_id":"s15-P2","season":2015,"competition":"League","stage":"Playoff","date":"2015-10-18","venue":"A","opponent":"North Bangkok","result":"D","gf":1,"ga":1,"pts":1,"stype":"League"},{"match_id":"s15-P3","season":2015,"competition":"League","stage":"Playoff","date":"2015-10-25","venue":"H","opponent":"KU FC","result":"W","gf":2,"ga":0,"pts":3,"stype":"League"},{"match_id":"s15-P4","season":2015,"competition":"League","stage":"Playoff","date":"2015-11-01","venue":"A","opponent":"KU FC","result":"L","gf":0,"ga":1,"pts":0,"stype":"League"},{"match_id":"s15-P5","season":2015,"competition":"League","stage":"Playoff","date":"2015-11-08","venue":"H","opponent":"Army FC","result":"W","gf":1,"ga":0,"pts":3,"stype":"League"},{"match_id":"s15-P6","season":2015,"competition":"League","stage":"Playoff","date":"2015-11-15","venue":"A","opponent":"Army FC","result":"L","gf":1,"ga":2,"pts":0,"stype":"League"},{"match_id":"s15-P7","season":2015,"competition":"League","stage":"Final","date":"2015-11-22","venue":"N","opponent":"Rangsit FC","result":"W","gf":2,"ga":1,"pts":3,"stype":"League"},{"match_id":"s15-P8","season":2015,"competition":"League","stage":"Final","date":"2015-11-29","venue":"N","opponent":"Rangsit FC","result":"L","gf":0,"ga":1,"pts":0,"stype":"League"},{"match_id":"s15-P9","season":2015,"competition":"League","stage":"Final","date":"2015-12-06","venue":"N","opponent":"Rangsit FC","result":"W","gf":3,"ga":2,"pts":3,"stype":"League"},{"match_id":"s15-P10","season":2015,"competition":"League","stage":"Playoff","date":"2015-12-13","venue":"N","opponent":"KU FC","result":"L","gf":1,"ga":2,"pts":0,"stype":"League"},{"match_id":"C23-01","season":2023,"competition":"Cup","stage":"Round 1","date":"2023-03-05","venue":"H","opponent":"Rangsit FC","result":"W","gf":3,"ga":0,"pts":3,"stype":"Cup"},{"match_id":"C24-01","season":2024,"competition":"Cup","stage":"Round 1","date":"2024-02-18","venue":"H","opponent":"ABAC FC","result":"W","gf":4,"ga":1,"pts":3,"stype":"Cup"},{"match_id":"C24-02","season":2024,"competition":"Cup","stage":"Quarter Final","date":"2024-03-10","venue":"A","opponent":"Army FC","result":"D","gf":1,"ga":1,"pts":1,"stype":"Cup"},{"match_id":"C24-03","season":2024,"competition":"Cup","stage":"Semi Final","date":"2024-04-07","venue":"N","opponent":"KU FC","result":"L","gf":0,"ga":1,"pts":0,"stype":"Cup"},{"match_id":"C25-01","season":2025,"competition":"Cup","stage":"Round 1","date":"2025-02-16","venue":"H","opponent":"Thammasat FC","result":"W","gf":2,"ga":0,"pts":3,"stype":"Cup"}];
+
+const PA = [{"pc":"P069","name":"กษิตินาถ ศรีภิรมย์","nick":"ฟรองค์","pos":"FC","apps":128,"starts":68,"subs":60,"g":29,"a":8,"gc":37,"seasons":[2017,2018,2019,2020,2021,2022,2023,2025]},{"pc":"P094","name":"ปราชญ์ปรีชา เพชรทอง","nick":"ปอ","pos":"FC","apps":104,"starts":89,"subs":15,"g":14,"a":12,"gc":26,"seasons":[2020,2021,2022,2023,2024]},{"pc":"P013","name":"ตะวัน สังขวิมล","nick":"ตะวัน","pos":"MF","apps":100,"starts":59,"subs":41,"g":5,"a":9,"gc":14,"seasons":[2015,2016,2017,2018,2019,2020,2021,2022]},{"pc":"P038","name":"พนมกรณ์ สายสอน","nick":"ป๊อก","pos":"MF","apps":99,"starts":81,"subs":18,"g":7,"a":20,"gc":27,"seasons":[2015,2016,2017,2018,2019]},{"pc":"P068","name":"ณัฐวัฒน์ โทบ้านซ้ง","nick":"ไฟฟ์","pos":"DF","apps":98,"starts":84,"subs":14,"g":5,"a":24,"gc":29,"seasons":[2017,2018,2019,2020,2021]},{"pc":"P102","name":"พรหมมินทร์ ปิ่นแก้ว","nick":"กอล์ฟ","pos":"MF","apps":82,"starts":69,"subs":13,"g":5,"a":7,"gc":12,"seasons":[2021,2022,2023,2024]},{"pc":"P054","name":"กริชชัย แสงรุ่ง","nick":"ปิ๊ก","pos":"GK","apps":78,"starts":78,"subs":0,"g":0,"a":1,"gc":1,"seasons":[2016,2017,2018,2019,2020,2021]},{"pc":"P090","name":"Mbengen","nick":"เบนเก้น","pos":"FC","apps":78,"starts":74,"subs":4,"g":31,"a":22,"gc":53,"seasons":[2019,2020,2021,2022]},{"pc":"P063","name":"ประกายเกียรติ สุขคง","nick":"แมน","pos":"MF","apps":76,"starts":69,"subs":7,"g":9,"a":10,"gc":19,"seasons":[2017,2018,2019,2020,2021]},{"pc":"P058","name":"ศักดิ์สิทธิ์ จิตวิจารณ์","nick":"ไมค์","pos":"DF","apps":75,"starts":72,"subs":3,"g":7,"a":1,"gc":8,"seasons":[2016,2017,2018,2019,2020]},{"pc":"P034","name":"ภูษิต ศรีดอกพุฒ","nick":"เต้ย","pos":"DF","apps":73,"starts":66,"subs":7,"g":1,"a":4,"gc":5,"seasons":[2015,2016,2017,2018,2019,2020]},{"pc":"P045","name":"Hiroyuki Sugimoto","nick":"Sugi","pos":"FC","apps":71,"starts":64,"subs":7,"g":26,"a":14,"gc":40,"seasons":[2016,2017,2018]},{"pc":"P053","name":"พีรณัฐ ซื่อมาก","nick":"ฟีฟ่า","pos":"MF","apps":71,"starts":42,"subs":29,"g":3,"a":6,"gc":9,"seasons":[2016,2017,2018,2019,2020]},{"pc":"P103","name":"วรเดช บุญมาขจรกิจ","nick":"เซฟตี้","pos":"MF","apps":71,"starts":34,"subs":37,"g":9,"a":2,"gc":11,"seasons":[2021,2022,2023,2024,2025]},{"pc":"P098","name":"อะหมัด หีมเบญหมัด","nick":"หมัด","pos":"DF","apps":70,"starts":54,"subs":16,"g":4,"a":6,"gc":10,"seasons":[2020,2021,2022,2023,2024]},{"pc":"P129","name":"วัชรพงษ์ วันทอง","nick":"เนส","pos":"MF","apps":70,"starts":50,"subs":20,"g":13,"a":8,"gc":21,"seasons":[2022,2023,2024,2025]},{"pc":"P066","name":"พนมพร พวงมาลัย","nick":"เน็ตตี้","pos":"MF","apps":69,"starts":61,"subs":8,"g":4,"a":2,"gc":6,"seasons":[2017,2018,2019,2020,2021,2023]},{"pc":"P075","name":"ภีมปภพ วิริยะชาญชัย","nick":"อู๋","pos":"MF","apps":66,"starts":38,"subs":28,"g":7,"a":9,"gc":16,"seasons":[2018,2019,2020,2021]},{"pc":"P047","name":"วีระเทพ ป้อมพันธ์","nick":"เตอร์","pos":"MF","apps":64,"starts":59,"subs":5,"g":3,"a":13,"gc":16,"seasons":[2016,2017,2018]},{"pc":"P132","name":"ธนนนท์ นุชประมูล","nick":"ไกด์","pos":"DF","apps":62,"starts":48,"subs":14,"g":4,"a":6,"gc":10,"seasons":[2022,2023,2024,2025]}];
+
+const SD = [{"season":2015,"W":17,"D":5,"L":14,"gf":59,"ga":51,"pts":56,"n":36},{"season":2016,"W":13,"D":6,"L":3,"gf":45,"ga":22,"pts":45,"n":22},{"season":2017,"W":12,"D":6,"L":10,"gf":50,"ga":38,"pts":42,"n":28},{"season":2018,"W":14,"D":4,"L":8,"gf":55,"ga":32,"pts":46,"n":26},{"season":2019,"W":11,"D":5,"L":10,"gf":44,"ga":43,"pts":38,"n":26},{"season":2020,"W":9,"D":4,"L":9,"gf":38,"ga":34,"pts":31,"n":22},{"season":2021,"W":13,"D":6,"L":7,"gf":52,"ga":36,"pts":45,"n":26},{"season":2022,"W":10,"D":5,"L":7,"gf":43,"ga":35,"pts":35,"n":22},{"season":2023,"W":10,"D":4,"L":7,"gf":38,"ga":30,"pts":34,"n":21},{"season":2024,"W":11,"D":4,"L":7,"gf":42,"ga":32,"pts":37,"n":22},{"season":2025,"W":14,"D":3,"L":7,"gf":48,"ga":28,"pts":45,"n":24}];
+
+/* ── CHARTS ─────────────────────────────────────────────── */
+let charts = {};
+function mkChart(id,cfg){if(charts[id])charts[id].destroy();charts[id]=new Chart(document.getElementById(id),cfg);return charts[id]}
+
+const GREEN='#3db87a',YELLOW='#f5c342',RED='#e85757',BLUE='#4f8ef7',PURPLE='#a78bfa';
+const gridOpts={color:'#ffffff0a'};
+const tickOpts={color:'#7a8299',font:{size:11}};
+
+function filterTS(){
+  const s=document.getElementById('f-season').value;
+  const c=document.getElementById('f-comp').value;
+  const v=document.getElementById('f-venue').value;
+  return TS.filter(m=>(!s||m.season==s)&&(!c||m.competition==c)&&(!v||m.venue==v));
+}
+
+function renderTeam(){
+  const data=filterTS();
+  const W=data.filter(m=>m.result=='W').length;
+  const D=data.filter(m=>m.result=='D').length;
+  const L=data.filter(m=>m.result=='L').length;
+  const gf=data.reduce((s,m)=>s+m.gf,0);
+  const ga=data.reduce((s,m)=>s+m.ga,0);
+  const pts=data.reduce((s,m)=>s+m.pts,0);
+
+  document.getElementById('team-metrics').innerHTML=`
+    <div class="metric"><div class="metric-label">นัดทั้งหมด</div><div class="metric-val blue">${data.length}</div></div>
+    <div class="metric"><div class="metric-label">ชนะ / เสมอ / แพ้</div><div class="metric-val" style="font-size:18px"><span style="color:${GREEN}">${W}</span> <span style="color:${YELLOW};font-size:14px">/ ${D} /</span> <span style="color:${RED}">${L}</span></div><div class="metric-sub">Win ${data.length?Math.round(W/data.length*100):0}%</div></div>
+    <div class="metric"><div class="metric-label">ประตูได้ / เสีย</div><div class="metric-val" style="font-size:20px"><span style="color:${GREEN}">${gf}</span> <span style="color:${RED};font-size:14px">/ ${ga}</span></div><div class="metric-sub">GD ${gf-ga>=0?'+':''}${gf-ga}</div></div>
+    <div class="metric"><div class="metric-label">แต้มรวม</div><div class="metric-val blue">${pts}</div><div class="metric-sub">${data.length?+(pts/data.length).toFixed(1):0} แต้ม/นัด</div></div>`;
+
+  // Season bar
+  const sd=SD.filter(s=>{
+    const comp=document.getElementById('f-comp').value;
+    const sv=document.getElementById('f-season').value;
+    return (!sv||s.season==sv);
+  });
+  mkChart('chart-season',{type:'bar',data:{labels:sd.map(s=>s.season),datasets:[{label:'ชนะ',data:sd.map(s=>s.W),backgroundColor:GREEN,borderRadius:2},{label:'เสมอ',data:sd.map(s=>s.D),backgroundColor:YELLOW,borderRadius:2},{label:'แพ้',data:sd.map(s=>s.L),backgroundColor:RED,borderRadius:2}]},options:{responsive:true,plugins:{legend:{labels:{color:'#7a8299',font:{size:11}}}},scales:{x:{stacked:true,ticks:tickOpts,grid:gridOpts},y:{stacked:true,ticks:tickOpts,grid:gridOpts}}}});
+
+  // Venue pie
+  const H=data.filter(m=>m.venue=='H').length,A=data.filter(m=>m.venue=='A').length;
+  mkChart('chart-venue',{type:'doughnut',data:{labels:['เหย้า','เยือน'],datasets:[{data:[H,A],backgroundColor:[BLUE,PURPLE],borderWidth:0}]},options:{responsive:true,cutout:'60%',plugins:{legend:{position:'bottom',labels:{color:'#7a8299',font:{size:11}}}}}});
+
+  // WDL donut
+  mkChart('chart-wdl',{type:'doughnut',data:{labels:['ชนะ','เสมอ','แพ้'],datasets:[{data:[W,D,L],backgroundColor:[GREEN,YELLOW,RED],borderWidth:0}]},options:{responsive:true,cutout:'60%',plugins:{legend:{position:'bottom',labels:{color:'#7a8299',font:{size:11}}}}}});
+
+  // Goals line
+  mkChart('chart-goals',{type:'bar',data:{labels:SD.map(s=>s.season),datasets:[{label:'ประตูได้',data:SD.map(s=>s.gf),backgroundColor:GREEN+'99',borderRadius:3},{label:'ประตูเสีย',data:SD.map(s=>s.ga),backgroundColor:RED+'99',borderRadius:3}]},options:{responsive:true,plugins:{legend:{labels:{color:'#7a8299',font:{size:11}}}},scales:{x:{ticks:tickOpts,grid:gridOpts},y:{ticks:tickOpts,grid:gridOpts}}}});
+
+  renderMatchTable();
+}
+
+function renderMatchTable(){
+  const data=filterTS();
+  const q=document.getElementById('match-search').value.toLowerCase();
+  const r=document.getElementById('f-result').value;
+  const filtered=data.filter(m=>(!q||m.opponent.toLowerCase().includes(q)||m.match_id.toLowerCase().includes(q))&&(!r||m.result==r));
+  const sorted=[...filtered].sort((a,b)=>b.date.localeCompare(a.date));
+  document.getElementById('match-tbody').innerHTML=sorted.slice(0,50).map(m=>`
+    <tr>
+      <td style="color:var(--muted)">${m.date}</td>
+      <td style="font-family:monospace;font-size:12px">${m.match_id}</td>
+      <td>${m.opponent}</td>
+      <td><span class="badge badge-${m.venue}">${m.venue=='H'?'เหย้า':'เยือน'}</span></td>
+      <td class="num">${m.gf}</td>
+      <td class="num">${m.ga}</td>
+      <td><span class="badge badge-${m.result}">${m.result=='W'?'ชนะ':m.result=='D'?'เสมอ':'แพ้'}</span></td>
+      <td class="num">${m.pts}</td>
+    </tr>`).join('');
+  document.getElementById('match-count').textContent=`แสดง ${Math.min(50,filtered.length)} จาก ${filtered.length} นัด`;
+}
+
+function filterPA(){
+  const pos=document.getElementById('fp-pos').value;
+  const sea=document.getElementById('fp-season').value;
+  const q=document.getElementById('player-search').value.toLowerCase();
+  return PA.filter(p=>(!pos||p.pos==pos)&&(!sea||p.seasons.includes(+sea))&&(!q||p.nick.includes(q)||p.name.includes(q)||p.pc.toLowerCase().includes(q)));
+}
+
+function renderPlayer(){
+  const data=filterPA();
+  const sort=document.getElementById('fp-sort').value;
+  const sorted=[...data].sort((a,b)=>b[sort]-a[sort]);
+
+  const totalApps=data.reduce((s,p)=>s+p.apps,0);
+  const totalG=data.reduce((s,p)=>s+p.g,0);
+  const totalA=data.reduce((s,p)=>s+p.a,0);
+
+  document.getElementById('player-metrics').innerHTML=`
+    <div class="metric"><div class="metric-label">นักเตะ</div><div class="metric-val blue">${data.length}</div></div>
+    <div class="metric"><div class="metric-label">การลงสนามรวม</div><div class="metric-val">${totalApps}</div></div>
+    <div class="metric"><div class="metric-label">ประตูรวม</div><div class="metric-val green">${totalG}</div></div>
+    <div class="metric"><div class="metric-label">แอสซิสต์รวม</div><div class="metric-val" style="color:${BLUE}">${totalA}</div></div>`;
+
+  // Top apps
+  const top10a=sorted.slice(0,10);
+  mkChart('chart-top-apps',{type:'bar',data:{labels:top10a.map(p=>p.nick),datasets:[{label:'ตัวจริง',data:top10a.map(p=>p.starts),backgroundColor:GREEN,borderRadius:3},{label:'สำรอง',data:top10a.map(p=>p.subs),backgroundColor:BLUE+'88',borderRadius:3}]},options:{indexAxis:'y',responsive:true,plugins:{legend:{labels:{color:'#7a8299',font:{size:11}}}},scales:{x:{stacked:true,ticks:tickOpts,grid:gridOpts},y:{stacked:true,ticks:{...tickOpts,font:{size:12}},grid:{display:false}}}}});
+
+  // Top GC
+  const top10gc=[...data].sort((a,b)=>b.gc-a.gc).slice(0,10);
+  mkChart('chart-top-gc',{type:'bar',data:{labels:top10gc.map(p=>p.nick),datasets:[{label:'ประตู',data:top10gc.map(p=>p.g),backgroundColor:GREEN,borderRadius:3},{label:'แอสซิสต์',data:top10gc.map(p=>p.a),backgroundColor:YELLOW,borderRadius:3}]},options:{indexAxis:'y',responsive:true,plugins:{legend:{labels:{color:'#7a8299',font:{size:11}}}},scales:{x:{stacked:true,ticks:tickOpts,grid:gridOpts},y:{stacked:true,ticks:{...tickOpts,font:{size:12}},grid:{display:false}}}}});
+
+  // Position
+  const posCnt={GK:0,DF:0,MF:0,FC:0};
+  data.forEach(p=>posCnt[p.pos]=(posCnt[p.pos]||0)+1);
+  mkChart('chart-pos',{type:'doughnut',data:{labels:['GK','DF','MF','FC'],datasets:[{data:[posCnt.GK,posCnt.DF,posCnt.MF,posCnt.FC],backgroundColor:[BLUE,GREEN,YELLOW,RED],borderWidth:0}]},options:{responsive:true,cutout:'55%',plugins:{legend:{position:'bottom',labels:{color:'#7a8299',font:{size:11}}}}}});
+
+  // Starter/Sub
+  const starts=data.reduce((s,p)=>s+p.starts,0);
+  const subs=data.reduce((s,p)=>s+p.subs,0);
+  mkChart('chart-app-type',{type:'doughnut',data:{labels:['ตัวจริง','สำรอง'],datasets:[{data:[starts,subs],backgroundColor:[GREEN,BLUE],borderWidth:0}]},options:{responsive:true,cutout:'55%',plugins:{legend:{position:'bottom',labels:{color:'#7a8299',font:{size:11}}}}}});
+
+  // Table
+  document.getElementById('player-tbody').innerHTML=sorted.map((p,i)=>`
+    <tr>
+      <td style="color:var(--muted)">${i+1}</td>
+      <td><strong>${p.nick}</strong></td>
+      <td style="color:var(--muted);font-size:12px">${p.name}</td>
+      <td><span class="badge-pos">${p.pos}</span></td>
+      <td class="num">${p.apps}</td>
+      <td class="num" style="color:${GREEN}">${p.starts}</td>
+      <td class="num" style="color:${BLUE}">${p.subs}</td>
+      <td class="num">${p.g>0?`<strong style="color:${GREEN}">${p.g}</strong>`:0}</td>
+      <td class="num">${p.a>0?`<strong style="color:${YELLOW}">${p.a}</strong>`:0}</td>
+      <td class="num">${p.gc>0?`<strong>${p.gc}</strong>`:0}</td>
+    </tr>`).join('');
+  document.getElementById('player-count').textContent=`แสดง ${sorted.length} นักเตะ`;
+}
+
+/* ── INIT ────────────────────────────────────────────────── */
+function showPage(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  event.target.classList.add('active');
+  if(id==='team') renderTeam(); else renderPlayer();
+}
+
+// Populate season dropdowns
+const seasons=[...new Set(TS.map(m=>m.season))].sort();
+seasons.forEach(s=>{
+  ['f-season','fp-season'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el){const o=document.createElement('option');o.value=s;o.textContent=s;el.appendChild(o);}
+  });
+});
+
+renderTeam();
+</script>
+</body>
+</html>
