@@ -589,25 +589,46 @@ function renderTeam(){
   // Determine which seasons to show
   var seasons=activeTSeason.size>0?[...activeTSeason].sort():allSeasonsList;
 
-  // Aggregate W/D/L across selected seasons
-  // Source: pick the player with most starts each season as reference
-  var totalW=0,totalD=0,totalL=0,totalApps=0;
-  seasons.forEach(function(yr){
-    var r=SEASON_RESULTS[yr];
-    if(!r)return;
-    totalW+=r.W;totalD+=r.D;totalL+=r.L;
-    totalApps+=(r.W+r.D+r.L);
-  });
+  // Aggregate totals — split by compFilter or not
+  var totalW=0,totalD=0,totalL=0,totalApps=0,totalGoals=0,totalAssists=0,totalCS=0;
 
-  // Goal/assist stats across selected seasons
-  var totalGoals=0,totalAssists=0;
-  DATA.forEach(function(p){
-    seasons.forEach(function(yr){
-      var d=p.by_season[String(yr)];
-      if(!d)return;
-      totalGoals+=d.g;totalAssists+=d.a;
+  if(compFilter){
+    // W/D/L: เนื่องจาก by_comp ไม่แยก by_season ให้ใช้ SEASON_RESULTS แบบ total
+    // แต่ goals/assists/CS ดึงจาก by_comp ต่อ player แล้วกรองเฉพาะ player
+    // ที่มี season ตรงกับ season ที่เลือกเป็น proxy
+    DATA.forEach(function(p){
+      var cd=p.by_comp[compFilter];
+      if(!cd)return;
+      // กรองว่า player เคยเล่นใน season ที่เลือกอย่างน้อย 1 season
+      var relevant=activeTSeason.size===0||seasons.some(function(yr){return !!p.by_season[String(yr)];});
+      if(!relevant)return;
+      totalGoals+=cd.g||0;
+      totalAssists+=cd.a||0;
+      totalCS+=cd.cs||0;
     });
-  });
+    // W/D/L: ใช้ by_season รวมทุก season ที่เลือก (best approximation เพราะ by_comp ไม่มี by_season)
+    seasons.forEach(function(yr){
+      var r=SEASON_RESULTS[yr];
+      if(!r)return;
+      totalW+=r.W;totalD+=r.D;totalL+=r.L;
+      totalApps+=(r.W+r.D+r.L);
+    });
+  } else {
+    // ไม่ได้ filter comp — รวมจาก by_season ตามปกติ
+    seasons.forEach(function(yr){
+      var r=SEASON_RESULTS[yr];
+      if(!r)return;
+      totalW+=r.W;totalD+=r.D;totalL+=r.L;
+      totalApps+=(r.W+r.D+r.L);
+    });
+    DATA.forEach(function(p){
+      seasons.forEach(function(yr){
+        var d=p.by_season[String(yr)];
+        if(!d)return;
+        totalGoals+=d.g;totalAssists+=d.a;totalCS+=(d.cs||0);
+      });
+    });
+  }
 
   var winRate=pct(totalW,totalApps);
   var drawRate=pct(totalD,totalApps);
@@ -623,6 +644,7 @@ function renderTeam(){
   html+='<div class="team-kpi"><div class="team-kpi-lbl">แพ้</div><div class="team-kpi-val" style="color:#dc2626">'+totalL+'</div><div class="team-kpi-sub">'+lossRate+'%</div></div>';
   html+='<div class="team-kpi"><div class="team-kpi-lbl">ประตู</div><div class="team-kpi-val">'+totalGoals+'</div><div class="team-kpi-sub">'+(totalApps>0?(totalGoals/totalApps).toFixed(2):0)+'/นัด</div></div>';
   html+='<div class="team-kpi"><div class="team-kpi-lbl">แอสซิสต์</div><div class="team-kpi-val">'+totalAssists+'</div><div class="team-kpi-sub">'+(totalApps>0?(totalAssists/totalApps).toFixed(2):0)+'/นัด</div></div>';
+  html+='<div class="team-kpi"><div class="team-kpi-lbl">Clean Sheet</div><div class="team-kpi-val" style="color:#1d4ed8">'+totalCS+'</div><div class="team-kpi-sub">'+(totalApps>0?Math.round(totalCS/totalApps*100):0)+'% ของนัด</div></div>';
   html+='</div>';
 
   // ── Win/Draw/Loss bar chart per season
@@ -687,7 +709,7 @@ function renderTeam(){
   html+='<div class="section">';
   html+='<div class="section-title">จำนวนนักเตะที่ลงสนามรายซีซัน</div>';
   html+='<table class="match-table">';
-  html+='<thead><tr><th>ซีซัน</th><th style="text-align:center">นักเตะ</th><th style="text-align:center">W</th><th style="text-align:center">D</th><th style="text-align:center">L</th><th style="text-align:center">Win%</th><th style="text-align:center">ประตู</th></tr></thead>';
+  html+='<thead><tr><th>ซีซัน</th><th style="text-align:center">นักเตะ</th><th style="text-align:center">W</th><th style="text-align:center">D</th><th style="text-align:center">L</th><th style="text-align:center">Win%</th><th style="text-align:center">ประตู</th><th style="text-align:center">CS</th></tr></thead>';
   html+='<tbody>';
   seasons.forEach(function(yr){
     var r=SEASON_RESULTS[yr];
@@ -697,6 +719,7 @@ function renderTeam(){
     // Count distinct players
     var pCount=DATA.filter(function(p){return p.by_season[String(yr)];}).length;
     var g=DATA.reduce(function(sum,p){var d=p.by_season[String(yr)];return sum+(d?d.g:0);},0);
+    var csCount=DATA.reduce(function(sum,p){var d=p.by_season[String(yr)];return sum+(d?d.cs||0:0);},0);
     html+='<tr>';
     html+='<td style="font-weight:600">'+yr+'</td>';
     html+='<td style="text-align:center">'+pCount+'</td>';
@@ -705,6 +728,7 @@ function renderTeam(){
     html+='<td style="text-align:center;color:#dc2626;font-weight:600">'+r.L+'</td>';
     html+='<td style="text-align:center"><span style="font-weight:700;color:'+(wp>=50?'#059669':'#dc2626')+'">'+wp+'%</span></td>';
     html+='<td style="text-align:center;font-weight:600;color:#9b1c4a">'+g+'</td>';
+    html+='<td style="text-align:center;font-weight:600;color:#1d4ed8">'+csCount+'</td>';
     html+='</tr>';
   });
   html+='</tbody></table>';
