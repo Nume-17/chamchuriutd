@@ -254,12 +254,12 @@ function getFiltered(p){
   Object.keys(p.by_season).forEach(function(k){
     if(activeSeas.has(Number(k)))bs[k]=p.by_season[k];
   });
-  var apps=0,starts=0,subs=0,g=0,a=0,W=0,D=0,L=0;
+  var apps=0,starts=0,subs=0,g=0,a=0,cs=0,W=0,D=0,L=0;
   Object.values(bs).forEach(function(v){
     apps+=v.apps;starts+=v.starts;subs+=v.subs;
-    g+=v.g;a+=v.a;W+=v.W||0;D+=v.D||0;L+=v.L||0;
+    g+=v.g;a+=v.a;cs+=(v.cs||0);W+=v.W||0;D+=v.D||0;L+=v.L||0;
   });
-  return Object.assign({},p,{total:{apps:apps,starts:starts,subs:subs,g:g,a:a,W:W,D:D,L:L},by_season:bs});
+  return Object.assign({},p,{total:{apps:apps,starts:starts,subs:subs,g:g,a:a,cs:cs,W:W,D:D,L:L},by_season:bs});
 }
 
 /* ── srow helper — NO nested quotes trick ── */
@@ -352,9 +352,11 @@ function render(){
   html+='<div class="kpi"><div class="kpi-lbl">G+A</div>';
   html+='<div class="kpi-val">'+gc+'</div>';
   html+='<div class="kpi-sub">'+(t.apps>0?(gc/t.apps).toFixed(2):0)+'/\u0e19\u0e31\u0e14</div></div>';
+  if(raw.pos==='GK'){
   html+='<div class="kpi"><div class="kpi-lbl">Clean Sheet</div>';
   html+='<div class="kpi-val" style="color:#1d4ed8">'+t.cs+'</div>';
-  html+='<div class="kpi-sub">'+(t.apps>0?Math.round(t.cs/t.apps*100):0)+'% \u0e02\u0e2d\u0e07\u0e19\u0e31\u0e14\u0e17\u0e35\u0e48\u0e25\u0e07</div></div>';
+  html+='<div class="kpi-sub">'+Math.round(t.apps>0?t.cs/t.apps*100:0)+'% \u0e02\u0e2d\u0e07\u0e19\u0e31\u0e14\u0e17\u0e35\u0e48\u0e25\u0e07</div></div>';
+  }
   html+='</div>';
 
   /* Appearances chart */
@@ -414,7 +416,7 @@ function render(){
       html+=srow('\u0e1b\u0e23\u0e30\u0e15\u0e39','<span style="color:#9b1c4a;font-weight:600">'+d.g+'</span>');
       html+=srow('\u0e41\u0e2d\u0e2a\u0e0b\u0e34\u0e2a\u0e15\u0e4c','<span style="color:#d97706;font-weight:600">'+d.a+'</span>');
       html+=srow('G+A',d.g+d.a);
-      html+=srow('Clean Sheet','<span style="color:#1d4ed8;font-weight:600">'+(d.cs||0)+'</span>');
+      if(raw.pos==='GK'){html+=srow('Clean Sheet','<span style="color:#1d4ed8;font-weight:600">'+(d.cs||0)+'</span>');}
       /* W/D/L badges with color */
       html+='<div class="wdl-badges">';
       html+='<span class="wdl-badge badge-w">W '+(d.W||0)+'</span>';
