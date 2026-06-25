@@ -240,32 +240,12 @@ var DATA=[{"pc":"P069","nick":"ฟรองค์","name":"กษิตินา
 
 
 /* ── Derive team-level stats from player DATA ── */
-function buildTeamStats(){
-  var seasonMap={};
-  DATA.forEach(function(p){
-    Object.keys(p.by_season).forEach(function(yr){
-      var d=p.by_season[yr];
-      var comp=Object.keys(p.by_comp);
-      if(!seasonMap[yr])seasonMap[yr]={season:Number(yr),W:0,D:0,L:0,matches:0,g_for:0,g_ag:0,comps:{}};
-      // matches played per season = max apps of any player that season
-      // W/D/L come from player totals — use the most consistent player (starter with most apps)
-    });
-  });
-  // Better: aggregate W/D/L from a single reference player per season
-  // Use the player with most starts per season as the source of truth for results
-  var seasonResults={};
-  DATA.forEach(function(p){
-    Object.keys(p.by_season).forEach(function(yr){
-      var d=p.by_season[yr];
-      if(!seasonResults[yr]||d.starts>(seasonResults[yr].starts||0)){
-        seasonResults[yr]={W:d.W||0,D:d.D||0,L:d.L||0,apps:d.apps,starts:d.starts,season:Number(yr)};
-      }
-    });
-  });
-  return seasonResults;
-}
-
-var SEASON_RESULTS=buildTeamStats();
+/* ── SEASON_RESULTS: sourced directly from team_stat sheet (true match records)
+   Replaces the old buildTeamStats() which inferred W/D/L from player data
+   and under-counted matches in 2023/2024/2025 (Cup matches missing).
+   Each entry includes: W, D, L, matches, g_for (goals for), g_ag (goals against),
+   cs (clean sheets), season, and by_comp breakdown for League/Cup filtering. ── */
+var SEASON_RESULTS = {"2015":{"W":17,"D":5,"L":14,"matches":36,"g_for":59,"g_ag":51,"cs":10,"season":2015,"by_comp":{"League":{"W":17,"D":5,"L":14,"matches":36,"g_for":59,"g_ag":51,"cs":10}}},"2016":{"W":13,"D":6,"L":3,"matches":22,"g_for":45,"g_ag":22,"cs":7,"season":2016,"by_comp":{"League":{"W":13,"D":6,"L":3,"matches":22,"g_for":45,"g_ag":22,"cs":7}}},"2017":{"W":12,"D":6,"L":10,"matches":28,"g_for":50,"g_ag":38,"cs":5,"season":2017,"by_comp":{"League":{"W":12,"D":6,"L":10,"matches":28,"g_for":50,"g_ag":38,"cs":5}}},"2018":{"W":12,"D":5,"L":9,"matches":26,"g_for":32,"g_ag":27,"cs":9,"season":2018,"by_comp":{"League":{"W":12,"D":5,"L":9,"matches":26,"g_for":32,"g_ag":27,"cs":9}}},"2019":{"W":7,"D":8,"L":11,"matches":26,"g_for":33,"g_ag":42,"cs":7,"season":2019,"by_comp":{"League":{"W":7,"D":8,"L":11,"matches":26,"g_for":33,"g_ag":42,"cs":7}}},"2020":{"W":12,"D":6,"L":4,"matches":22,"g_for":49,"g_ag":23,"cs":9,"season":2020,"by_comp":{"League":{"W":12,"D":6,"L":4,"matches":22,"g_for":49,"g_ag":23,"cs":9}}},"2021":{"W":12,"D":10,"L":4,"matches":26,"g_for":44,"g_ag":23,"cs":10,"season":2021,"by_comp":{"League":{"W":12,"D":10,"L":4,"matches":26,"g_for":44,"g_ag":23,"cs":10}}},"2022":{"W":10,"D":8,"L":8,"matches":26,"g_for":33,"g_ag":31,"cs":8,"season":2022,"by_comp":{"League":{"W":10,"D":8,"L":8,"matches":26,"g_for":33,"g_ag":31,"cs":8}}},"2023":{"W":6,"D":8,"L":13,"matches":27,"g_for":29,"g_ag":42,"cs":6,"season":2023,"by_comp":{"Cup":{"W":0,"D":0,"L":1,"matches":1,"g_for":1,"g_ag":1,"cs":0},"League":{"W":6,"D":8,"L":12,"matches":26,"g_for":28,"g_ag":41,"cs":6}}},"2024":{"W":7,"D":5,"L":12,"matches":24,"g_for":30,"g_ag":43,"cs":2,"season":2024,"by_comp":{"Cup":{"W":1,"D":0,"L":3,"matches":4,"g_for":4,"g_ag":13,"cs":0},"League":{"W":6,"D":5,"L":9,"matches":20,"g_for":26,"g_ag":30,"cs":2}}},"2025":{"W":9,"D":5,"L":10,"matches":24,"g_for":36,"g_ag":31,"cs":3,"season":2025,"by_comp":{"Cup":{"W":1,"D":1,"L":2,"matches":4,"g_for":3,"g_ag":5,"cs":0},"League":{"W":8,"D":4,"L":8,"matches":20,"g_for":33,"g_ag":26,"cs":3}}}};
 
 /* ── Aggregate goal scorers per season ── */
 function buildScorers(){
@@ -589,43 +569,39 @@ function renderTeam(){
   // Determine which seasons to show
   var seasons=activeTSeason.size>0?[...activeTSeason].sort():allSeasonsList;
 
-  // Aggregate totals — split by compFilter or not
-  var totalW=0,totalD=0,totalL=0,totalApps=0,totalGoals=0,totalAssists=0,totalCS=0;
+  // Aggregate W/D/L/matches/goals/CS from SEASON_RESULTS (truth from team_stat)
+  var totalW=0,totalD=0,totalL=0,totalApps=0,totalGoals=0,totalAssists=0,totalCS=0,totalGF=0,totalGA=0;
 
+  seasons.forEach(function(yr){
+    var r=SEASON_RESULTS[String(yr)];
+    if(!r)return;
+    if(compFilter){
+      var rc=r.by_comp[compFilter];
+      if(!rc)return;
+      totalW+=rc.W;totalD+=rc.D;totalL+=rc.L;
+      totalApps+=rc.matches;
+      totalGF+=rc.g_for;totalGA+=rc.g_ag;totalCS+=rc.cs;
+    } else {
+      totalW+=r.W;totalD+=r.D;totalL+=r.L;
+      totalApps+=r.matches;
+      totalGF+=r.g_for;totalGA+=r.g_ag;totalCS+=r.cs;
+    }
+  });
+  totalGoals=totalGF;
+
+  // Assists from player data (not in team_stat)
   if(compFilter){
-    // W/D/L: เนื่องจาก by_comp ไม่แยก by_season ให้ใช้ SEASON_RESULTS แบบ total
-    // แต่ goals/assists/CS ดึงจาก by_comp ต่อ player แล้วกรองเฉพาะ player
-    // ที่มี season ตรงกับ season ที่เลือกเป็น proxy
     DATA.forEach(function(p){
       var cd=p.by_comp[compFilter];
       if(!cd)return;
-      // กรองว่า player เคยเล่นใน season ที่เลือกอย่างน้อย 1 season
-      var relevant=activeTSeason.size===0||seasons.some(function(yr){return !!p.by_season[String(yr)];});
-      if(!relevant)return;
-      totalGoals+=cd.g||0;
       totalAssists+=cd.a||0;
-      totalCS+=cd.cs||0;
-    });
-    // W/D/L: ใช้ by_season รวมทุก season ที่เลือก (best approximation เพราะ by_comp ไม่มี by_season)
-    seasons.forEach(function(yr){
-      var r=SEASON_RESULTS[yr];
-      if(!r)return;
-      totalW+=r.W;totalD+=r.D;totalL+=r.L;
-      totalApps+=(r.W+r.D+r.L);
     });
   } else {
-    // ไม่ได้ filter comp — รวมจาก by_season ตามปกติ
-    seasons.forEach(function(yr){
-      var r=SEASON_RESULTS[yr];
-      if(!r)return;
-      totalW+=r.W;totalD+=r.D;totalL+=r.L;
-      totalApps+=(r.W+r.D+r.L);
-    });
     DATA.forEach(function(p){
       seasons.forEach(function(yr){
         var d=p.by_season[String(yr)];
         if(!d)return;
-        totalGoals+=d.g;totalAssists+=d.a;totalCS+=(d.cs||0);
+        totalAssists+=d.a;
       });
     });
   }
@@ -642,8 +618,8 @@ function renderTeam(){
   html+='<div class="team-kpi"><div class="team-kpi-lbl">ชนะ</div><div class="team-kpi-val" style="color:#059669">'+totalW+'</div><div class="team-kpi-sub">'+winRate+'%</div></div>';
   html+='<div class="team-kpi"><div class="team-kpi-lbl">เสมอ</div><div class="team-kpi-val" style="color:#6b7280">'+totalD+'</div><div class="team-kpi-sub">'+drawRate+'%</div></div>';
   html+='<div class="team-kpi"><div class="team-kpi-lbl">แพ้</div><div class="team-kpi-val" style="color:#dc2626">'+totalL+'</div><div class="team-kpi-sub">'+lossRate+'%</div></div>';
-  html+='<div class="team-kpi"><div class="team-kpi-lbl">ประตู</div><div class="team-kpi-val">'+totalGoals+'</div><div class="team-kpi-sub">'+(totalApps>0?(totalGoals/totalApps).toFixed(2):0)+'/นัด</div></div>';
-  html+='<div class="team-kpi"><div class="team-kpi-lbl">แอสซิสต์</div><div class="team-kpi-val">'+totalAssists+'</div><div class="team-kpi-sub">'+(totalApps>0?(totalAssists/totalApps).toFixed(2):0)+'/นัด</div></div>';
+  html+='<div class="team-kpi"><div class="team-kpi-lbl">ประตูได้</div><div class="team-kpi-val">'+totalGoals+'</div><div class="team-kpi-sub">'+(totalApps>0?(totalGoals/totalApps).toFixed(2):0)+'/นัด</div></div>';
+  html+='<div class="team-kpi"><div class="team-kpi-lbl">ประตูเสีย</div><div class="team-kpi-val" style="color:#dc2626">'+totalGA+'</div><div class="team-kpi-sub">'+(totalApps>0?(totalGA/totalApps).toFixed(2):0)+'/นัด</div></div>';
   html+='<div class="team-kpi"><div class="team-kpi-lbl">Clean Sheet</div><div class="team-kpi-val" style="color:#1d4ed8">'+totalCS+'</div><div class="team-kpi-sub">'+(totalApps>0?Math.round(totalCS/totalApps*100):0)+'% ของนัด</div></div>';
   html+='</div>';
 
@@ -709,25 +685,26 @@ function renderTeam(){
   html+='<div class="section">';
   html+='<div class="section-title">จำนวนนักเตะที่ลงสนามรายซีซัน</div>';
   html+='<table class="match-table">';
-  html+='<thead><tr><th>ซีซัน</th><th style="text-align:center">นักเตะ</th><th style="text-align:center">W</th><th style="text-align:center">D</th><th style="text-align:center">L</th><th style="text-align:center">Win%</th><th style="text-align:center">ประตู</th><th style="text-align:center">CS</th></tr></thead>';
+  html+='<thead><tr><th>ซีซัน</th><th style="text-align:center">นัด</th><th style="text-align:center">W</th><th style="text-align:center">D</th><th style="text-align:center">L</th><th style="text-align:center">Win%</th><th style="text-align:center">GF</th><th style="text-align:center">GA</th><th style="text-align:center">CS</th></tr></thead>';
   html+='<tbody>';
   seasons.forEach(function(yr){
     var r=SEASON_RESULTS[yr];
     if(!r)return;
-    var matches=r.W+r.D+r.L;
+    var matches=r.matches;
     var wp=pct(r.W,matches);
     // Count distinct players
     var pCount=DATA.filter(function(p){return p.by_season[String(yr)];}).length;
-    var g=DATA.reduce(function(sum,p){var d=p.by_season[String(yr)];return sum+(d?d.g:0);},0);
-    var csCount=DATA.reduce(function(sum,p){var d=p.by_season[String(yr)];return sum+(d?d.cs||0:0);},0);
+    var g=r.g_for;
+    var csCount=r.cs;
     html+='<tr>';
     html+='<td style="font-weight:600">'+yr+'</td>';
-    html+='<td style="text-align:center">'+pCount+'</td>';
+    html+='<td style="text-align:center">'+matches+'</td>';
     html+='<td style="text-align:center;color:#059669;font-weight:600">'+r.W+'</td>';
     html+='<td style="text-align:center;color:#6b7280;font-weight:600">'+r.D+'</td>';
     html+='<td style="text-align:center;color:#dc2626;font-weight:600">'+r.L+'</td>';
     html+='<td style="text-align:center"><span style="font-weight:700;color:'+(wp>=50?'#059669':'#dc2626')+'">'+wp+'%</span></td>';
     html+='<td style="text-align:center;font-weight:600;color:#9b1c4a">'+g+'</td>';
+    html+='<td style="text-align:center;font-weight:600;color:#dc2626">'+r.g_ag+'</td>';
     html+='<td style="text-align:center;font-weight:600;color:#1d4ed8">'+csCount+'</td>';
     html+='</tr>';
   });
@@ -753,15 +730,25 @@ function drawTeamCharts(seasons){
   ]},options:baseOpts(true)});
 
   // Goals per season
+  var compFilter=document.getElementById('t-comp')?document.getElementById('t-comp').value:'';
   var gData=seasons.map(function(yr){
-    return DATA.reduce(function(sum,p){var d=p.by_season[String(yr)];return sum+(d?d.g:0);},0);
+    var r=SEASON_RESULTS[String(yr)];
+    if(!r)return 0;
+    if(compFilter){var rc=r.by_comp[compFilter];return rc?rc.g_for:0;}
+    return r.g_for;
+  });
+  var gaData=seasons.map(function(yr){
+    var r=SEASON_RESULTS[String(yr)];
+    if(!r)return 0;
+    if(compFilter){var rc=r.by_comp[compFilter];return rc?rc.g_ag:0;}
+    return r.g_ag;
   });
   var aData=seasons.map(function(yr){
     return DATA.reduce(function(sum,p){var d=p.by_season[String(yr)];return sum+(d?d.a:0);},0);
   });
   mkChart('ch-team-goals',{type:'bar',data:{labels:seasons.map(String),datasets:[
-    {label:'ประตู',data:gData,backgroundColor:C_GOAL,borderRadius:2},
-    {label:'แอสซิสต์',data:aData,backgroundColor:C_ASSIST,borderRadius:2}
+    {label:'ประตูได้',data:gData,backgroundColor:C_GOAL,borderRadius:2},
+    {label:'ประตูเสีย',data:gaData,backgroundColor:'#fca5a5',borderRadius:2}
   ]},options:baseOpts(false)});
 }
 
