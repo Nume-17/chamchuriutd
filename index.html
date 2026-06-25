@@ -723,10 +723,11 @@ function renderTeam(){
 }
 
 function drawTeamCharts(seasons){
-  // W/D/L stacked bar per season
-  var wData=seasons.map(function(yr){var r=SEASON_RESULTS[yr];return r?r.W:0;});
-  var dData=seasons.map(function(yr){var r=SEASON_RESULTS[yr];return r?r.D:0;});
-  var lData=seasons.map(function(yr){var r=SEASON_RESULTS[yr];return r?r.L:0;});
+  var compFilter=document.getElementById('t-comp')?document.getElementById('t-comp').value:'';
+  // W/D/L stacked bar per season — กรอง by_comp ถ้ามี compFilter
+  var wData=seasons.map(function(yr){var r=SEASON_RESULTS[yr];if(!r)return 0;var src=compFilter?(r.by_comp[compFilter]||null):r;return src?src.W:0;});
+  var dData=seasons.map(function(yr){var r=SEASON_RESULTS[yr];if(!r)return 0;var src=compFilter?(r.by_comp[compFilter]||null):r;return src?src.D:0;});
+  var lData=seasons.map(function(yr){var r=SEASON_RESULTS[yr];if(!r)return 0;var src=compFilter?(r.by_comp[compFilter]||null):r;return src?src.L:0;});
   mkChart('ch-team-wdl',{type:'bar',data:{labels:seasons.map(String),datasets:[
     {label:'ชนะ',data:wData,backgroundColor:C_WIN,borderRadius:2},
     {label:'เสมอ',data:dData,backgroundColor:C_DRAW,borderRadius:2},
@@ -734,7 +735,6 @@ function drawTeamCharts(seasons){
   ]},options:baseOpts(true)});
 
   // Goals per season
-  var compFilter=document.getElementById('t-comp')?document.getElementById('t-comp').value:'';
   var gData=seasons.map(function(yr){
     var r=SEASON_RESULTS[String(yr)];
     if(!r)return 0;
