@@ -594,7 +594,13 @@ function renderTeam(){
     DATA.forEach(function(p){
       var cd=p.by_comp[compFilter];
       if(!cd)return;
-      totalAssists+=cd.a||0;
+      var playerTotalApps=p.total.apps||1;
+      var ratio=cd.apps/playerTotalApps;
+      seasons.forEach(function(yr){
+        var d=p.by_season[String(yr)];
+        if(!d)return;
+        totalAssists+=Math.round((d.a||0)*ratio);
+      });
     });
   } else {
     DATA.forEach(function(p){
@@ -690,22 +696,20 @@ function renderTeam(){
   seasons.forEach(function(yr){
     var r=SEASON_RESULTS[yr];
     if(!r)return;
-    var matches=r.matches;
-    var wp=pct(r.W,matches);
-    // Count distinct players
-    var pCount=DATA.filter(function(p){return p.by_season[String(yr)];}).length;
-    var g=r.g_for;
-    var csCount=r.cs;
+    var src=compFilter?(r.by_comp[compFilter]||null):r;
+    if(!src)return;
+    var matches=src.matches;
+    var wp=pct(src.W,matches);
     html+='<tr>';
     html+='<td style="font-weight:600">'+yr+'</td>';
     html+='<td style="text-align:center">'+matches+'</td>';
-    html+='<td style="text-align:center;color:#059669;font-weight:600">'+r.W+'</td>';
-    html+='<td style="text-align:center;color:#6b7280;font-weight:600">'+r.D+'</td>';
-    html+='<td style="text-align:center;color:#dc2626;font-weight:600">'+r.L+'</td>';
+    html+='<td style="text-align:center;color:#059669;font-weight:600">'+src.W+'</td>';
+    html+='<td style="text-align:center;color:#6b7280;font-weight:600">'+src.D+'</td>';
+    html+='<td style="text-align:center;color:#dc2626;font-weight:600">'+src.L+'</td>';
     html+='<td style="text-align:center"><span style="font-weight:700;color:'+(wp>=50?'#059669':'#dc2626')+'">'+wp+'%</span></td>';
-    html+='<td style="text-align:center;font-weight:600;color:#9b1c4a">'+g+'</td>';
-    html+='<td style="text-align:center;font-weight:600;color:#dc2626">'+r.g_ag+'</td>';
-    html+='<td style="text-align:center;font-weight:600;color:#1d4ed8">'+csCount+'</td>';
+    html+='<td style="text-align:center;font-weight:600;color:#9b1c4a">'+src.g_for+'</td>';
+    html+='<td style="text-align:center;font-weight:600;color:#dc2626">'+src.g_ag+'</td>';
+    html+='<td style="text-align:center;font-weight:600;color:#1d4ed8">'+src.cs+'</td>';
     html+='</tr>';
   });
   html+='</tbody></table>';
